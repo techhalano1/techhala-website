@@ -38,12 +38,12 @@ export function Terminal({ steps }: { steps: Step[] }) {
   const current = steps[stepIdx];
 
   return (
-    <div className="glow overflow-hidden rounded-xl border border-border bg-[#0b0f19] font-mono text-[13px] leading-relaxed text-slate-200 shadow-2xl">
+    <div className="glow overflow-hidden rounded-xl border border-border bg-[#0d0d0d] font-mono text-[13px] leading-relaxed text-zinc-200 shadow-2xl">
       <div className="flex items-center gap-1.5 border-b border-white/10 px-4 py-2.5">
         <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
         <span className="h-2.5 w-2.5 rounded-full bg-yellow-400/80" />
         <span className="h-2.5 w-2.5 rounded-full bg-green-400/80" />
-        <span className="ml-3 text-xs text-slate-500">hal — zsh</span>
+        <span className="ml-3 text-xs text-zinc-500">hal — zsh</span>
       </div>
       <div className="min-h-[300px] p-5" aria-live="polite">
         {history.map((s, i) => (
@@ -70,9 +70,9 @@ export function Terminal({ steps }: { steps: Step[] }) {
 function Line({ cmd, cursor = false }: { cmd: string; cursor?: boolean }) {
   return (
     <div>
-      <span className="text-sky-400">➜</span> <span className="text-violet-300">~/app</span>{" "}
-      <span className="text-slate-100">{cmd}</span>
-      {cursor && <span className="cursor-blink ml-0.5 inline-block h-4 w-2 translate-y-0.5 bg-slate-300" />}
+      <span className="text-red-500">➜</span> <span className="text-zinc-400">~/app</span>{" "}
+      <span className="text-zinc-100">{cmd}</span>
+      {cursor && <span className="cursor-blink ml-0.5 inline-block h-4 w-2 translate-y-0.5 bg-zinc-300" />}
     </div>
   );
 }
@@ -80,6 +80,6 @@ function Line({ cmd, cursor = false }: { cmd: string; cursor?: boolean }) {
 function Out({ text }: { text: string }) {
   const ok = text.startsWith("✓");
   return (
-    <div className={`fade-up pl-4 ${ok ? "text-emerald-300" : "text-slate-400"}`}>{text}</div>
+    <div className={`fade-up pl-4 ${ok ? "text-emerald-300" : "text-zinc-400"}`}>{text}</div>
   );
 }

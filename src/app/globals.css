@@ -5,21 +5,21 @@
 :root {
   --bg: #fafafa;
   --bg-elev: #ffffff;
-  --fg: #0b0f19;
-  --muted: #5b6475;
-  --border: #e5e7eb;
-  --accent: #0ea5e9;
-  --accent-2: #6366f1;
+  --fg: #0a0a0a;
+  --muted: #52525b;
+  --border: #e4e4e7;
+  --accent: #e60012;
+  --accent-2: #8a0000;
 }
 
 .dark {
-  --bg: #05070d;
-  --bg-elev: #0b0f19;
-  --fg: #f1f5f9;
-  --muted: #94a3b8;
-  --border: #1e293b;
-  --accent: #38bdf8;
-  --accent-2: #818cf8;
+  --bg: #070707;
+  --bg-elev: #111111;
+  --fg: #f5f5f5;
+  --muted: #a1a1aa;
+  --border: #262626;
+  --accent: #ff1a1a;
+  --accent-2: #ff6b5c;
 }
 
 @theme inline {
