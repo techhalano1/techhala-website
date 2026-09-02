@@ -4,8 +4,8 @@ export const en: Dictionary = {
   meta: {
     title: "TechHala — AI that ships",
     description:
-      "TechHala builds AI systems that plan, write, run, and operate software — and extend the same intelligence to robots and edge devices. AI SDLC, AIOps, AI Robot, and custom AI Solutions.",
-    ogTitle: "TechHala — AI SDLC, AIOps, AI Robot & AI Solutions",
+      "TechHala builds intelligent robots for education, AI-driven software development, and enterprise AI services — chatbots, assistants, and private AI platforms deployed in production.",
+    ogTitle: "TechHala — AI Robot, AI for SDLC & AI for Enterprise",
   },
   nav: {
     solutions: "Solutions",
@@ -36,7 +36,7 @@ export const en: Dictionary = {
       title: "AI that",
       highlight: "ships.",
       subtitle:
-        "From intent to production — we build AI that plans, writes, verifies, and operates software, and bring the same intelligence to robots and the physical world.",
+        "We build intelligence that teaches through robots, that plans, writes, and verifies software, and that runs as dependable AI services inside the enterprise.",
       primaryCta: "Book a demo",
       secondaryCta: "Explore solutions",
       terminal: [
@@ -68,9 +68,9 @@ export const en: Dictionary = {
     },
     pillars: {
       eyebrow: "What we do",
-      title: "Four pillars, one intelligence layer",
+      title: "Three focus areas, one intelligence layer",
       subtitle:
-        "Whether the problem lives in your codebase, your production systems, your factory floor, or your customer experience — we bring the same disciplined, traceable AI approach.",
+        "Whether the problem lives in a classroom, in your codebase, or across your organization — we bring the same disciplined, production-grade AI approach.",
     },
     lifecycle: {
       eyebrow: "How we work",
@@ -83,7 +83,7 @@ export const en: Dictionary = {
         { name: "Build", desc: "Specialized agents implement in parallel, within your standards." },
         { name: "Verify", desc: "Independent multi-persona review, tests, and security gates." },
         { name: "Ship", desc: "Conventional commits, PRs, and a complete audit trail." },
-        { name: "Operate", desc: "AIOps watches production, finds root causes, and remediates." },
+        { name: "Operate", desc: "Monitor, evaluate, and improve AI services and systems in production." },
       ],
     },
     product: {
@@ -134,7 +134,7 @@ export const en: Dictionary = {
   solutions: {
     title: "Solutions",
     subtitle:
-      "Four areas where we apply AI end-to-end — with the engineering rigor to put it in production.",
+      "Three areas where we apply AI end-to-end — with the engineering rigor to put it in production.",
     sectionLabels: {
       problem: "The problem",
       approach: "Our approach",
@@ -144,11 +144,53 @@ export const en: Dictionary = {
     },
     items: [
       {
+        slug: "ai-robot",
+        name: "AI Robot",
+        tagline: "Intelligent robots that teach, talk, and learn with people.",
+        summary:
+          "We build the intelligence layer for educational and service robots: natural conversation, speech and vision, adaptive tutoring — starting with robots that help children and adults learn English.",
+        problem: {
+          title: "Robots can move. Very few can hold a conversation worth having.",
+          body:
+            "Most educational robots run scripted dialogues that children outgrow in a week, and language learners rarely get enough real speaking practice with a patient partner. The hardware exists — what's missing is intelligence that listens, understands, adapts to each learner, and stays safe for the classroom and the home.",
+        },
+        approach: {
+          title: "Listen, understand, teach, adapt",
+          steps: [
+            { title: "Natural conversation", body: "Low-latency speech-to-speech with a consistent personality, so the robot feels like a companion, not a menu." },
+            { title: "Pedagogy built in", body: "Lesson plans, vocabulary progression, pronunciation feedback, and games designed with educators and mapped to CEFR levels." },
+            { title: "Perception & presence", body: "Vision and voice let the robot recognize learners, read engagement, and respond with expression and gesture." },
+            { title: "Learn from every session", body: "Progress tracking for teachers and parents; the tutor adapts difficulty and topics to each learner." },
+          ],
+        },
+        capabilities: [
+          { title: "English-learning companion", body: "Conversational practice, pronunciation coaching, vocabulary games, and story time — tuned for kids and adult learners." },
+          { title: "Conversational brain", body: "Speech recognition, LLM reasoning with guardrails, and expressive speech synthesis — running on-device or hybrid." },
+          { title: "Vision & engagement", body: "Face and gesture recognition, attention cues, and object recognition for interactive lessons." },
+          { title: "Teacher & parent dashboard", body: "Session summaries, progress by skill, and content controls." },
+          { title: "Robot & hardware integration", body: "Integration with humanoid, tabletop, and mobile robot platforms — motion, LEDs, screens, and sensors." },
+          { title: "Safety & privacy", body: "Age-appropriate content filters, on-device processing where possible, and parental consent flows." },
+        ],
+        outcomes: [
+          "More speaking practice per learner than any classroom can offer",
+          "Engagement that lasts beyond the novelty week",
+          "Measurable progress for teachers and parents",
+          "One intelligence platform across robot models",
+        ],
+        useCases: [
+          "English-learning robots for kindergartens and primary schools",
+          "Home tutoring companions for children",
+          "Language centers and self-study kiosks",
+          "Reception, museum, and service robots that converse naturally",
+        ],
+        cta: "Discuss an education robot project",
+      },
+      {
         slug: "ai-sdlc",
-        name: "AI SDLC",
+        name: "AI for SDLC",
         tagline: "Turn business intent into traceable, reviewed, working software.",
         summary:
-          "An AI-driven software development lifecycle: plan, build, verify, and ship with specialized agents — and keep humans in control of every decision.",
+          "An AI-driven software development lifecycle: plan, build, verify, and ship with specialized agents — and keep humans in control of every decision. Powered by our HAL-SDLC platform.",
         problem: {
           title: "Code assistants speed up typing. They don't speed up delivery.",
           body:
@@ -198,130 +240,46 @@ export const en: Dictionary = {
         cta: "Discuss an AI SDLC pilot",
       },
       {
-        slug: "aiops",
-        name: "AIOps",
-        tagline: "Operations that detect, explain, and fix themselves.",
+        slug: "ai-enterprise",
+        name: "AI for Enterprise",
+        tagline: "Chatbots, assistants, and AI services deployed securely inside your organization.",
         summary:
-          "Bring AI to production operations: anomaly detection, root-cause analysis, and guided or automated remediation across your infrastructure and applications.",
+          "From customer-facing chatbots to internal copilots and private AI platforms — we design, build, deploy, and operate AI services that fit your data, your systems, and your compliance requirements.",
         problem: {
-          title: "Alerts are cheap. Understanding is expensive.",
+          title: "A demo takes a day. A production AI service takes discipline.",
           body:
-            "Modern systems generate more signals than any on-call team can read. Incidents take hours because the hard part isn't seeing the alert — it's correlating logs, metrics, traces, and changes to find the real cause.",
+            "Prototypes with large language models are easy. Reliable enterprise services — grounded in your data, integrated with your systems, secured, evaluated, cost-controlled, and monitored in production — are where most initiatives stall.",
         },
         approach: {
-          title: "From noise to root cause to action",
+          title: "From use case to running service",
           steps: [
-            { title: "Unify signals", body: "Connect metrics, logs, traces, deployments, and tickets into one operational context." },
-            { title: "Detect intelligently", body: "Baseline normal behavior and surface real anomalies, not threshold noise." },
-            { title: "Explain", body: "LLM-assisted root-cause analysis that correlates changes and dependencies into a readable incident narrative." },
-            { title: "Remediate", body: "Runbooks executed by agents with approval gates — from guided suggestions to full auto-remediation." },
+            { title: "Discover", body: "Identify the highest-value use cases, data sources, and success metrics with your business and IT teams." },
+            { title: "Design", body: "Conversation design, knowledge architecture, and integration blueprint aligned with security and compliance." },
+            { title: "Build & integrate", body: "Retrieval, orchestration, guardrails, and connectors to CRM, ERP, ticketing, and identity systems." },
+            { title: "Deploy & operate", body: "Private or hybrid deployment, observability, cost management, evaluation, and continuous improvement." },
           ],
         },
         capabilities: [
-          { title: "Anomaly detection", body: "Adaptive baselines across services, infrastructure, and business KPIs." },
-          { title: "Root-cause analysis", body: "Change-aware correlation with plain-language explanations." },
-          { title: "Agentic runbooks", body: "Codified remediation with human approval where it matters." },
-          { title: "Incident copilot", body: "Chat-based assistant that answers 'what changed?' and 'who is affected?'." },
-          { title: "Capacity & cost", body: "Forecasting and right-sizing recommendations for cloud spend." },
-          { title: "Observability integration", body: "Works with your existing stack — Prometheus, Grafana, Datadog, ELK, and more." },
+          { title: "Customer service chatbots", body: "Multilingual assistants for web, app, and messaging channels — grounded in your knowledge with human handoff." },
+          { title: "Employee assistants & copilots", body: "Internal copilots for HR, IT, sales, and operations that answer from policies and act in your tools." },
+          { title: "Knowledge hubs & RAG", body: "Documents, databases, and tickets turned into trusted answers with citations and access control." },
+          { title: "Private AI platform", body: "LLM gateway, model hosting, and vector infrastructure deployed in your cloud or on-premises." },
+          { title: "AI service operations", body: "Monitoring, evaluation, cost control, and incident response for AI in production — including AIOps for your platforms." },
+          { title: "Generative content & data products", body: "Image, video, and document generation pipelines plus data-rich applications built for scale." },
         ],
         outcomes: [
-          "Shorter mean time to detect and resolve",
-          "Fewer false-positive pages for on-call teams",
-          "Incident reports written as the incident unfolds",
-          "Lower cloud cost through data-driven right-sizing",
+          "Assistants that resolve requests, not just deflect them",
+          "Answers grounded in your data, with sources and permissions respected",
+          "Predictable costs and measurable quality after launch",
+          "A platform you own — no vendor lock-in",
         ],
         useCases: [
-          "24/7 operations for customer-facing platforms",
-          "Kubernetes and microservice environments",
-          "Hybrid and multi-cloud estates",
-          "Teams moving from reactive to proactive operations",
+          "Customer support and sales assistants for retail, banking, and telecom",
+          "Internal knowledge assistants for large organizations",
+          "Deploying private LLM services for regulated industries",
+          "Content, media, and data platforms powered by generative AI",
         ],
-        cta: "Discuss an AIOps assessment",
-      },
-      {
-        slug: "ai-robot",
-        name: "AI Robot",
-        tagline: "Perception and decision-making for robots, cameras, and the edge.",
-        summary:
-          "Computer vision, edge inference, and agentic control that turn cameras and robots into systems that understand their environment and act on it.",
-        problem: {
-          title: "Sensors everywhere, intelligence nowhere.",
-          body:
-            "Cameras and robots collect enormous amounts of data, but most of it is reviewed after the fact — if at all. Turning perception into timely, reliable action requires models that run at the edge and decision logic that operators can trust.",
-        },
-        approach: {
-          title: "See, understand, act",
-          steps: [
-            { title: "Perception", body: "Detection, tracking, and scene understanding tuned to your environment and hardware." },
-            { title: "Edge deployment", body: "Optimized models running on-device for low latency, privacy, and resilience without connectivity." },
-            { title: "Agentic control", body: "Event-driven logic and LLM reasoning that translate what is seen into safe, auditable actions." },
-            { title: "Intelligent hub", body: "A central layer that coordinates devices, aggregates insights, and integrates with your systems." },
-          ],
-        },
-        capabilities: [
-          { title: "AI camera systems", body: "Safety, quality inspection, occupancy, and workflow analytics from existing camera feeds." },
-          { title: "Edge inference", body: "Model optimization and deployment on Jetson, ARM, and industrial gateways." },
-          { title: "Robot integration", body: "Perception and task planning for mobile and manipulation robots." },
-          { title: "Digital twin & simulation", body: "Validate behavior in simulation before it reaches the floor." },
-          { title: "Fleet management", body: "Monitor, update, and operate devices at scale." },
-          { title: "Human-in-the-loop", body: "Review, override, and feedback loops that keep operators in control." },
-        ],
-        outcomes: [
-          "Real-time alerts instead of after-the-fact review",
-          "Higher consistency in inspection and safety compliance",
-          "Data that flows into operations instead of sitting on disks",
-          "Systems that keep working when the network doesn't",
-        ],
-        useCases: [
-          "Manufacturing quality and safety monitoring",
-          "Smart buildings, retail, and logistics analytics",
-          "Warehouse and service robots",
-          "Infrastructure inspection",
-        ],
-        cta: "Discuss a vision or robotics project",
-      },
-      {
-        slug: "ai-solutions",
-        name: "AI Solutions",
-        tagline: "Custom AI products — from assistants to generative media.",
-        summary:
-          "End-to-end design and delivery of AI applications: enterprise assistants, voice and avatar companions, knowledge hubs, and generative content pipelines.",
-        problem: {
-          title: "A demo takes a day. A product takes discipline.",
-          body:
-            "Prototypes with large language models are easy. Reliable products — with grounding in your data, guardrails, evaluation, cost control, and a great user experience — are where most initiatives stall.",
-        },
-        approach: {
-          title: "Product thinking with engineering rigor",
-          steps: [
-            { title: "Discover", body: "Identify the highest-value use cases and define what success looks like." },
-            { title: "Design", body: "Conversation, voice, and interface design grounded in real user workflows." },
-            { title: "Build", body: "Retrieval, orchestration, evaluation, and integration with your systems." },
-            { title: "Run", body: "Monitoring, cost management, and continuous improvement after launch." },
-          ],
-        },
-        capabilities: [
-          { title: "Enterprise assistants", body: "Virtual assistants grounded in your knowledge, integrated with your tools." },
-          { title: "Voice & avatar experiences", body: "Real-time speech-to-speech companions with lifelike, lip-synced avatars." },
-          { title: "Knowledge hubs & RAG", body: "Turn documents and data into answers your teams and customers can trust." },
-          { title: "Generative media", body: "Image and video generation pipelines for marketing, film, and product content." },
-          { title: "Geospatial & data products", body: "Map-based and data-rich applications built for scale and search visibility." },
-          { title: "Evaluation & guardrails", body: "Quality, safety, and cost controls measured continuously." },
-        ],
-        outcomes: [
-          "AI experiences customers actually use — and return to",
-          "Answers grounded in your data, with sources",
-          "Predictable costs and measurable quality",
-          "A platform you own, not a vendor lock-in",
-        ],
-        useCases: [
-          "Customer service and sales assistants",
-          "Companion and education apps",
-          "Internal knowledge and expert systems",
-          "Content and media production",
-        ],
-        cta: "Discuss an AI product",
+        cta: "Discuss an enterprise AI project",
       },
     ],
   },
@@ -391,7 +349,7 @@ export const en: Dictionary = {
         title: "Enterprise virtual assistant for a retail group",
         client: "Retail & consumer",
         industry: "Retail",
-        pillar: "ai-solutions",
+        pillar: "ai-enterprise",
         summary: "A multilingual virtual assistant that answers customer and staff questions from company knowledge and connects to internal systems.",
         challenge: "Support teams handled repetitive questions across channels while policies and product information changed weekly. Existing chatbots were rule-based and fell behind.",
         solution: "We designed a retrieval-grounded assistant with conversation design tailored to the brand, connected to knowledge sources and internal APIs, with evaluation and escalation to human agents built in.",
@@ -399,21 +357,21 @@ export const en: Dictionary = {
       },
       {
         slug: "voice-ai-companion",
-        title: "Real-time voice companion with lip-synced avatars",
+        title: "Real-time voice companion for conversation practice",
         client: "Consumer app",
-        industry: "Consumer & education",
-        pillar: "ai-solutions",
-        summary: "A speech-to-speech companion app where users create characters with their own persona, voice, and animated avatar.",
-        challenge: "Deliver natural, low-latency voice conversations with expressive video avatars across iOS, Android, and web — with a small team.",
-        solution: "We built a multimodal pipeline — speech recognition, in-character reasoning, high-quality speech synthesis, and lip-synced video — behind a mobile-first experience for creating and talking with companions.",
-        results: ["Cross-platform release from a single codebase", "Persona-consistent conversations with custom voices", "Video avatars synchronized to generated speech"],
+        industry: "Education & consumer",
+        pillar: "ai-robot",
+        summary: "A speech-to-speech companion where learners talk with characters that have their own persona, voice, and animated face — the conversational brain we bring to educational robots.",
+        challenge: "Deliver natural, low-latency voice conversations with expressive, lip-synced avatars across iOS, Android, and web — engaging enough that learners keep practicing.",
+        solution: "We built a multimodal pipeline — speech recognition, in-character reasoning with guardrails, high-quality speech synthesis, and lip-synced video — behind a mobile-first experience for creating and talking with companions.",
+        results: ["Cross-platform release from a single codebase", "Persona-consistent conversations with custom voices", "Same pipeline now powering robot conversation and tutoring"],
       },
       {
         slug: "generative-film-pipeline",
         title: "Generative image & video pipeline for film concepts",
         client: "Media & entertainment",
         industry: "Media",
-        pillar: "ai-solutions",
+        pillar: "ai-enterprise",
         summary: "A production pipeline that turns scripts and prompts into consistent concept imagery and short video sequences.",
         challenge: "Concept development for film required many iterations of visuals and motion tests that were slow and expensive to produce traditionally.",
         solution: "We built an orchestrated pipeline using state-of-the-art image and video generation models with prompt management, style consistency, and review workflows for the creative team.",
@@ -424,7 +382,7 @@ export const en: Dictionary = {
         title: "Nationwide geospatial heritage platform",
         client: "Culture & tourism",
         industry: "Public & tourism",
-        pillar: "ai-solutions",
+        pillar: "ai-enterprise",
         summary: "A bilingual, map-based registry of more than 3,000 cultural sites with AI-assisted data enrichment and search-optimized pages.",
         challenge: "Site information was scattered across sources, inconsistent, and unavailable in a modern, searchable format.",
         solution: "We built automated ingestion and AI-assisted enrichment pipelines, a clustered interactive map, and thousands of statically generated bilingual pages optimized for search and mobile.",
@@ -445,10 +403,10 @@ export const en: Dictionary = {
   },
   about: {
     title: "About TechHala",
-    subtitle: "An AI engineering studio building systems that plan, build, operate, and perceive.",
+    subtitle: "An AI engineering studio building intelligence for robots, software teams, and the enterprise.",
     mission: {
       title: "Our mission",
-      body: "Make AI a dependable engineering discipline — traceable, reviewable, and in production — across software, operations, and the physical world.",
+      body: "Make AI a dependable engineering discipline — traceable, reviewable, and in production — whether it teaches a child, builds software, or serves an organization.",
     },
     values: [
       { title: "Traceable by default", body: "Every AI decision should have a reason you can read and a record you can audit." },
@@ -460,12 +418,12 @@ export const en: Dictionary = {
       title: "Our story",
       paragraphs: [
         "TechHala started with a simple frustration: AI could write code, but nobody could explain why it wrote what it did — or trust it enough to ship. We set out to build the missing lifecycle around AI: planning, verification, and operations.",
-        "That work became HAL-SDLC, our AI software development lifecycle engine, and shaped how we approach every problem — from keeping production systems healthy to teaching cameras and robots to act on what they see.",
+        "That work became HAL-SDLC, our AI software development lifecycle engine, and shaped how we approach every problem — from deploying AI services inside enterprises to giving educational robots a voice that listens, understands, and teaches.",
         "Today we partner with organizations in Vietnam and internationally to design, build, and operate AI systems that hold up in the real world.",
       ],
     },
     stats: [
-      { value: "4", label: "solution pillars" },
+      { value: "3", label: "focus areas" },
       { value: "1", label: "flagship platform" },
       { value: "VN + Global", label: "clients served" },
       { value: "100%", label: "human-approved delivery" },
@@ -479,7 +437,7 @@ export const en: Dictionary = {
       email: "Work email",
       company: "Company",
       topic: "I'm interested in",
-      topics: ["AI SDLC / HAL-SDLC", "AIOps", "AI Robot & Vision", "AI Solutions", "Partnership", "Other"],
+      topics: ["AI Robot / Education", "AI for SDLC / HAL-SDLC", "AI for Enterprise", "Partnership", "Other"],
       message: "What are you working on?",
       submit: "Send message",
       sending: "Sending…",
@@ -494,7 +452,7 @@ export const en: Dictionary = {
     },
   },
   footer: {
-    tagline: "AI that ships — across software, operations, and the physical world.",
+    tagline: "AI that ships — for robots, software teams, and the enterprise.",
     solutions: "Solutions",
     company: "Company",
     rights: "All rights reserved.",

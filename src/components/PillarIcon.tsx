@@ -1,10 +1,9 @@
 import type { PillarSlug } from "@/content";
 
 const paths: Record<PillarSlug, string> = {
-  "ai-sdlc": "M8 6l-5 6 5 6M16 6l5 6-5 6M14 4l-4 16",
-  aiops: "M3 12h4l3-8 4 16 3-8h4",
   "ai-robot": "M12 2v3M8 5h8a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3zM9 11h.01M15 11h.01M9 15h6",
-  "ai-solutions": "M12 3l2.5 5.5L20 11l-5.5 2.5L12 19l-2.5-5.5L4 11l5.5-2.5zM19 3v3M19 18v3M3 19h3",
+  "ai-sdlc": "M8 6l-5 6 5 6M16 6l5 6-5 6M14 4l-4 16",
+  "ai-enterprise": "M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4M9 10h.01M15 10h.01M9 14h.01M15 14h.01",
 };
 
 export function PillarIcon({ slug, className = "" }: { slug: PillarSlug; className?: string }) {

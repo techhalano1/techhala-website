@@ -4,8 +4,8 @@ export const vi: Dictionary = {
   meta: {
     title: "TechHala — AI đưa sản phẩm ra thị trường",
     description:
-      "TechHala xây dựng các hệ thống AI có khả năng lập kế hoạch, viết, vận hành phần mềm — và mang trí tuệ đó đến robot và thiết bị biên. AI SDLC, AIOps, AI Robot và Giải pháp AI theo yêu cầu.",
-    ogTitle: "TechHala — AI SDLC, AIOps, AI Robot & Giải pháp AI",
+      "TechHala xây dựng robot thông minh cho giáo dục, phát triển phần mềm dẫn dắt bởi AI và dịch vụ AI cho doanh nghiệp — chatbot, trợ lý và nền tảng AI riêng đưa vào vận hành thực tế.",
+    ogTitle: "TechHala — AI Robot, AI cho SDLC & AI cho Doanh nghiệp",
   },
   nav: {
     solutions: "Giải pháp",
@@ -36,7 +36,7 @@ export const vi: Dictionary = {
       title: "AI thực sự",
       highlight: "đi vào vận hành.",
       subtitle:
-        "Từ ý tưởng đến sản phẩm — chúng tôi xây dựng AI có khả năng lập kế hoạch, viết, kiểm chứng và vận hành phần mềm, đồng thời mang trí tuệ đó đến robot và thế giới vật lý.",
+        "Chúng tôi xây dựng trí tuệ biết dạy học qua robot, biết lập kế hoạch, viết và kiểm chứng phần mềm, và vận hành như những dịch vụ AI đáng tin cậy trong doanh nghiệp.",
       primaryCta: "Đặt lịch demo",
       secondaryCta: "Khám phá giải pháp",
       terminal: [
@@ -68,9 +68,9 @@ export const vi: Dictionary = {
     },
     pillars: {
       eyebrow: "Chúng tôi làm gì",
-      title: "Bốn trụ cột, một lớp trí tuệ chung",
+      title: "Ba trọng tâm, một lớp trí tuệ chung",
       subtitle:
-        "Dù bài toán nằm trong mã nguồn, hệ thống vận hành, nhà xưởng hay trải nghiệm khách hàng — chúng tôi áp dụng cùng một cách tiếp cận AI kỷ luật và truy vết được.",
+        "Dù bài toán nằm trong lớp học, trong mã nguồn hay trải rộng khắp tổ chức của bạn — chúng tôi áp dụng cùng một cách tiếp cận AI kỷ luật, sẵn sàng cho vận hành thực tế.",
     },
     lifecycle: {
       eyebrow: "Cách chúng tôi làm việc",
@@ -83,7 +83,7 @@ export const vi: Dictionary = {
         { name: "Xây dựng", desc: "Các agent chuyên biệt triển khai song song, theo chuẩn của bạn." },
         { name: "Kiểm chứng", desc: "Review đa góc nhìn độc lập, kiểm thử và cổng bảo mật." },
         { name: "Phát hành", desc: "Commit chuẩn, pull request và nhật ký kiểm toán đầy đủ." },
-        { name: "Vận hành", desc: "AIOps giám sát production, tìm nguyên nhân gốc và tự khắc phục." },
+        { name: "Vận hành", desc: "Giám sát, đánh giá và cải tiến dịch vụ AI và hệ thống trong production." },
       ],
     },
     product: {
@@ -134,7 +134,7 @@ export const vi: Dictionary = {
   solutions: {
     title: "Giải pháp",
     subtitle:
-      "Bốn lĩnh vực chúng tôi ứng dụng AI từ đầu đến cuối — với độ kỹ thuật đủ để đưa vào vận hành thực tế.",
+      "Ba lĩnh vực chúng tôi ứng dụng AI từ đầu đến cuối — với độ kỹ thuật đủ để đưa vào vận hành thực tế.",
     sectionLabels: {
       problem: "Vấn đề",
       approach: "Cách tiếp cận",
@@ -144,11 +144,53 @@ export const vi: Dictionary = {
     },
     items: [
       {
+        slug: "ai-robot",
+        name: "AI Robot",
+        tagline: "Robot thông minh biết dạy, biết trò chuyện và học cùng con người.",
+        summary:
+          "Chúng tôi xây dựng lớp trí tuệ cho robot giáo dục và robot dịch vụ: hội thoại tự nhiên, giọng nói và thị giác, gia sư thích ứng — bắt đầu với robot giúp trẻ em và người lớn học tiếng Anh.",
+        problem: {
+          title: "Robot biết di chuyển. Rất ít robot biết trò chuyện có ý nghĩa.",
+          body:
+            "Phần lớn robot giáo dục chạy các hội thoại kịch bản mà trẻ chán chỉ sau một tuần, còn người học ngoại ngữ hiếm khi có đủ cơ hội luyện nói với một người bạn kiên nhẫn. Phần cứng đã có — điều còn thiếu là trí tuệ biết lắng nghe, hiểu, thích ứng với từng người học và an toàn cho lớp học lẫn gia đình.",
+        },
+        approach: {
+          title: "Lắng nghe, hiểu, dạy, thích ứng",
+          steps: [
+            { title: "Hội thoại tự nhiên", body: "Giọng nói sang giọng nói độ trễ thấp với tính cách nhất quán, để robot giống một người bạn đồng hành, không phải một menu." },
+            { title: "Sư phạm tích hợp", body: "Giáo án, lộ trình từ vựng, phản hồi phát âm và trò chơi được thiết kế cùng giáo viên, bám theo khung CEFR." },
+            { title: "Nhận thức & hiện diện", body: "Thị giác và giọng nói giúp robot nhận ra người học, đọc mức độ tập trung và phản hồi bằng biểu cảm, cử chỉ." },
+            { title: "Học từ mỗi buổi", body: "Theo dõi tiến độ cho giáo viên và phụ huynh; gia sư điều chỉnh độ khó và chủ đề theo từng người học." },
+          ],
+        },
+        capabilities: [
+          { title: "Bạn đồng hành học tiếng Anh", body: "Luyện hội thoại, sửa phát âm, trò chơi từ vựng và kể chuyện — tối ưu cho trẻ em và người học trưởng thành." },
+          { title: "Bộ não hội thoại", body: "Nhận dạng giọng nói, suy luận LLM có rào chắn và tổng hợp giọng nói biểu cảm — chạy trên thiết bị hoặc hybrid." },
+          { title: "Thị giác & tương tác", body: "Nhận dạng khuôn mặt, cử chỉ, tín hiệu tập trung và nhận dạng vật thể cho bài học tương tác." },
+          { title: "Bảng điều khiển giáo viên & phụ huynh", body: "Tóm tắt buổi học, tiến độ theo kỹ năng và kiểm soát nội dung." },
+          { title: "Tích hợp robot & phần cứng", body: "Tích hợp với robot hình người, robot để bàn và robot di động — chuyển động, LED, màn hình và cảm biến." },
+          { title: "An toàn & riêng tư", body: "Bộ lọc nội dung theo độ tuổi, xử lý trên thiết bị khi có thể và quy trình đồng ý của phụ huynh." },
+        ],
+        outcomes: [
+          "Nhiều thời gian luyện nói cho mỗi người học hơn bất kỳ lớp học nào",
+          "Sự hứng thú kéo dài sau tuần đầu tò mò",
+          "Tiến độ đo lường được cho giáo viên và phụ huynh",
+          "Một nền tảng trí tuệ dùng chung cho nhiều mẫu robot",
+        ],
+        useCases: [
+          "Robot học tiếng Anh cho trường mầm non và tiểu học",
+          "Bạn đồng hành gia sư tại nhà cho trẻ em",
+          "Trung tâm ngoại ngữ và kiosk tự học",
+          "Robot lễ tân, bảo tàng và dịch vụ trò chuyện tự nhiên",
+        ],
+        cta: "Trao đổi về dự án robot giáo dục",
+      },
+      {
         slug: "ai-sdlc",
-        name: "AI SDLC",
+        name: "AI cho SDLC",
         tagline: "Biến ý định kinh doanh thành phần mềm truy vết được, đã review, chạy thật.",
         summary:
-          "Vòng đời phát triển phần mềm dẫn dắt bởi AI: lập kế hoạch, xây dựng, kiểm chứng và phát hành với các agent chuyên biệt — con người vẫn kiểm soát mọi quyết định.",
+          "Vòng đời phát triển phần mềm dẫn dắt bởi AI: lập kế hoạch, xây dựng, kiểm chứng và phát hành với các agent chuyên biệt — con người vẫn kiểm soát mọi quyết định. Vận hành trên nền tảng HAL-SDLC của chúng tôi.",
         problem: {
           title: "Trợ lý viết mã giúp gõ nhanh hơn. Nhưng không giúp bàn giao nhanh hơn.",
           body:
@@ -198,130 +240,46 @@ export const vi: Dictionary = {
         cta: "Trao đổi về thí điểm AI SDLC",
       },
       {
-        slug: "aiops",
-        name: "AIOps",
-        tagline: "Vận hành tự phát hiện, tự giải thích và tự khắc phục.",
+        slug: "ai-enterprise",
+        name: "AI cho Doanh nghiệp",
+        tagline: "Chatbot, trợ lý và dịch vụ AI triển khai an toàn trong tổ chức của bạn.",
         summary:
-          "Đưa AI vào vận hành production: phát hiện bất thường, phân tích nguyên nhân gốc, và khắc phục có hướng dẫn hoặc tự động trên hạ tầng và ứng dụng.",
+          "Từ chatbot phục vụ khách hàng đến copilot nội bộ và nền tảng AI riêng — chúng tôi thiết kế, xây dựng, triển khai và vận hành các dịch vụ AI phù hợp với dữ liệu, hệ thống và yêu cầu tuân thủ của bạn.",
         problem: {
-          title: "Cảnh báo thì rẻ. Hiểu được vấn đề mới đắt.",
+          title: "Làm demo mất một ngày. Đưa dịch vụ AI vào vận hành cần kỷ luật.",
           body:
-            "Hệ thống hiện đại sinh ra nhiều tín hiệu hơn bất kỳ đội on-call nào có thể đọc. Sự cố kéo dài hàng giờ vì phần khó không phải là thấy cảnh báo — mà là liên kết log, metric, trace và các thay đổi để tìm nguyên nhân thật.",
+            "Tạo nguyên mẫu với mô hình ngôn ngữ lớn rất dễ. Dịch vụ doanh nghiệp đáng tin cậy — bám vào dữ liệu của bạn, tích hợp với hệ thống, bảo mật, được đánh giá, kiểm soát chi phí và giám sát trong production — là nơi hầu hết sáng kiến bị mắc kẹt.",
         },
         approach: {
-          title: "Từ nhiễu đến nguyên nhân gốc đến hành động",
+          title: "Từ bài toán đến dịch vụ đang chạy",
           steps: [
-            { title: "Hợp nhất tín hiệu", body: "Kết nối metric, log, trace, triển khai và ticket vào một ngữ cảnh vận hành." },
-            { title: "Phát hiện thông minh", body: "Thiết lập đường cơ sở hành vi bình thường và nổi bật bất thường thật, không phải nhiễu ngưỡng." },
-            { title: "Giải thích", body: "Phân tích nguyên nhân gốc với hỗ trợ LLM, liên kết thay đổi và phụ thuộc thành một tường thuật sự cố dễ đọc." },
-            { title: "Khắc phục", body: "Runbook do agent thực thi với cổng phê duyệt — từ gợi ý có hướng dẫn đến tự khắc phục hoàn toàn." },
+            { title: "Khám phá", body: "Xác định các trường hợp giá trị nhất, nguồn dữ liệu và chỉ số thành công cùng đội kinh doanh và CNTT." },
+            { title: "Thiết kế", body: "Thiết kế hội thoại, kiến trúc tri thức và bản thiết kế tích hợp phù hợp bảo mật và tuân thủ." },
+            { title: "Xây dựng & tích hợp", body: "Truy xuất, điều phối, rào chắn và kết nối với CRM, ERP, hệ thống ticket và định danh." },
+            { title: "Triển khai & vận hành", body: "Triển khai riêng hoặc hybrid, giám sát, quản lý chi phí, đánh giá và cải tiến liên tục." },
           ],
         },
         capabilities: [
-          { title: "Phát hiện bất thường", body: "Đường cơ sở thích ứng trên dịch vụ, hạ tầng và KPI kinh doanh." },
-          { title: "Phân tích nguyên nhân gốc", body: "Liên kết nhận biết thay đổi với giải thích bằng ngôn ngữ tự nhiên." },
-          { title: "Runbook agent", body: "Khắc phục được mã hóa với phê duyệt của con người ở những điểm quan trọng." },
-          { title: "Trợ lý sự cố", body: "Trợ lý chat trả lời 'điều gì đã thay đổi?' và 'ai bị ảnh hưởng?'." },
-          { title: "Dung lượng & chi phí", body: "Dự báo và khuyến nghị tối ưu kích cỡ cho chi phí cloud." },
-          { title: "Tích hợp observability", body: "Hoạt động với stack hiện có — Prometheus, Grafana, Datadog, ELK và hơn nữa." },
+          { title: "Chatbot chăm sóc khách hàng", body: "Trợ lý đa ngôn ngữ cho web, ứng dụng và kênh nhắn tin — bám vào tri thức của bạn, có chuyển tiếp cho nhân viên." },
+          { title: "Trợ lý & copilot cho nhân viên", body: "Copilot nội bộ cho nhân sự, CNTT, kinh doanh và vận hành: trả lời từ chính sách và thao tác trong công cụ của bạn." },
+          { title: "Trung tâm tri thức & RAG", body: "Tài liệu, cơ sở dữ liệu và ticket biến thành câu trả lời tin cậy có trích dẫn và phân quyền." },
+          { title: "Nền tảng AI riêng", body: "LLM gateway, lưu trữ mô hình và hạ tầng vector triển khai trên cloud của bạn hoặc tại chỗ." },
+          { title: "Vận hành dịch vụ AI", body: "Giám sát, đánh giá, kiểm soát chi phí và xử lý sự cố cho AI trong production — bao gồm AIOps cho nền tảng của bạn." },
+          { title: "Nội dung sinh tạo & sản phẩm dữ liệu", body: "Pipeline sinh ảnh, video, tài liệu và các ứng dụng giàu dữ liệu được xây cho quy mô lớn." },
         ],
         outcomes: [
-          "Rút ngắn thời gian phát hiện và xử lý sự cố",
-          "Ít cảnh báo sai cho đội on-call",
-          "Báo cáo sự cố được viết ngay khi sự cố diễn ra",
-          "Giảm chi phí cloud nhờ tối ưu dựa trên dữ liệu",
+          "Trợ lý giải quyết yêu cầu, không chỉ né tránh",
+          "Câu trả lời bám vào dữ liệu của bạn, có nguồn và tôn trọng phân quyền",
+          "Chi phí dự đoán được và chất lượng đo lường được sau khi ra mắt",
+          "Nền tảng bạn sở hữu — không phụ thuộc nhà cung cấp",
         ],
         useCases: [
-          "Vận hành 24/7 cho nền tảng hướng khách hàng",
-          "Môi trường Kubernetes và microservice",
-          "Hạ tầng hybrid và multi-cloud",
-          "Đội ngũ chuyển từ vận hành phản ứng sang chủ động",
+          "Trợ lý hỗ trợ khách hàng và bán hàng cho bán lẻ, ngân hàng, viễn thông",
+          "Trợ lý tri thức nội bộ cho tổ chức lớn",
+          "Triển khai dịch vụ LLM riêng cho ngành có quy định chặt",
+          "Nền tảng nội dung, truyền thông và dữ liệu vận hành bằng AI sinh tạo",
         ],
-        cta: "Trao đổi về đánh giá AIOps",
-      },
-      {
-        slug: "ai-robot",
-        name: "AI Robot",
-        tagline: "Nhận thức và ra quyết định cho robot, camera và thiết bị biên.",
-        summary:
-          "Thị giác máy tính, suy luận tại biên và điều khiển agentic biến camera và robot thành hệ thống hiểu môi trường và hành động theo đó.",
-        problem: {
-          title: "Cảm biến ở mọi nơi, trí tuệ không ở đâu.",
-          body:
-            "Camera và robot thu thập lượng dữ liệu khổng lồ, nhưng phần lớn chỉ được xem lại sau khi sự việc đã xảy ra — nếu có. Biến nhận thức thành hành động kịp thời, đáng tin cậy đòi hỏi mô hình chạy tại biên và logic quyết định mà người vận hành có thể tin tưởng.",
-        },
-        approach: {
-          title: "Nhìn, hiểu, hành động",
-          steps: [
-            { title: "Nhận thức", body: "Phát hiện, theo dõi và hiểu bối cảnh được tinh chỉnh cho môi trường và phần cứng của bạn." },
-            { title: "Triển khai tại biên", body: "Mô hình tối ưu chạy trên thiết bị cho độ trễ thấp, riêng tư và bền vững khi mất kết nối." },
-            { title: "Điều khiển agentic", body: "Logic hướng sự kiện và suy luận LLM chuyển điều nhìn thấy thành hành động an toàn, kiểm toán được." },
-            { title: "Trung tâm thông minh", body: "Lớp trung tâm điều phối thiết bị, tổng hợp insight và tích hợp với hệ thống của bạn." },
-          ],
-        },
-        capabilities: [
-          { title: "Hệ thống camera AI", body: "Phân tích an toàn, kiểm tra chất lượng, mật độ và quy trình từ camera hiện có." },
-          { title: "Suy luận tại biên", body: "Tối ưu và triển khai mô hình trên Jetson, ARM và gateway công nghiệp." },
-          { title: "Tích hợp robot", body: "Nhận thức và lập kế hoạch tác vụ cho robot di động và robot thao tác." },
-          { title: "Digital twin & mô phỏng", body: "Kiểm chứng hành vi trong mô phỏng trước khi đưa xuống xưởng." },
-          { title: "Quản lý đội thiết bị", body: "Giám sát, cập nhật và vận hành thiết bị ở quy mô lớn." },
-          { title: "Con người trong vòng lặp", body: "Vòng review, ghi đè và phản hồi giữ người vận hành trong tầm kiểm soát." },
-        ],
-        outcomes: [
-          "Cảnh báo thời gian thực thay vì xem lại sau",
-          "Nhất quán cao hơn trong kiểm tra và tuân thủ an toàn",
-          "Dữ liệu chảy vào vận hành thay vì nằm trên ổ đĩa",
-          "Hệ thống vẫn hoạt động khi mạng không",
-        ],
-        useCases: [
-          "Giám sát chất lượng và an toàn trong sản xuất",
-          "Phân tích tòa nhà thông minh, bán lẻ và logistics",
-          "Robot kho vận và robot dịch vụ",
-          "Kiểm tra hạ tầng",
-        ],
-        cta: "Trao đổi về dự án thị giác hoặc robot",
-      },
-      {
-        slug: "ai-solutions",
-        name: "Giải pháp AI",
-        tagline: "Sản phẩm AI theo yêu cầu — từ trợ lý đến nội dung sinh tạo.",
-        summary:
-          "Thiết kế và bàn giao trọn gói ứng dụng AI: trợ lý doanh nghiệp, người bạn ảo bằng giọng nói và avatar, trung tâm tri thức và pipeline nội dung sinh tạo.",
-        problem: {
-          title: "Làm demo mất một ngày. Làm sản phẩm cần kỷ luật.",
-          body:
-            "Tạo nguyên mẫu với mô hình ngôn ngữ lớn rất dễ. Sản phẩm đáng tin cậy — bám vào dữ liệu của bạn, có rào chắn, đánh giá, kiểm soát chi phí và trải nghiệm tốt — là nơi hầu hết sáng kiến bị mắc kẹt.",
-        },
-        approach: {
-          title: "Tư duy sản phẩm với độ kỹ thuật cao",
-          steps: [
-            { title: "Khám phá", body: "Xác định các trường hợp giá trị nhất và định nghĩa thành công." },
-            { title: "Thiết kế", body: "Thiết kế hội thoại, giọng nói và giao diện dựa trên quy trình thực của người dùng." },
-            { title: "Xây dựng", body: "Truy xuất, điều phối, đánh giá và tích hợp với hệ thống của bạn." },
-            { title: "Vận hành", body: "Giám sát, quản lý chi phí và cải tiến liên tục sau khi ra mắt." },
-          ],
-        },
-        capabilities: [
-          { title: "Trợ lý doanh nghiệp", body: "Trợ lý ảo bám vào tri thức của bạn, tích hợp với công cụ của bạn." },
-          { title: "Trải nghiệm giọng nói & avatar", body: "Người bạn ảo hội thoại thời gian thực với avatar sống động, khớp khẩu hình." },
-          { title: "Trung tâm tri thức & RAG", body: "Biến tài liệu và dữ liệu thành câu trả lời mà đội ngũ và khách hàng tin tưởng." },
-          { title: "Nội dung sinh tạo", body: "Pipeline sinh ảnh và video cho marketing, phim và nội dung sản phẩm." },
-          { title: "Sản phẩm địa lý & dữ liệu", body: "Ứng dụng bản đồ và giàu dữ liệu được xây cho quy mô và khả năng tìm kiếm." },
-          { title: "Đánh giá & rào chắn", body: "Chất lượng, an toàn và chi phí được đo lường liên tục." },
-        ],
-        outcomes: [
-          "Trải nghiệm AI khách hàng thực sự dùng — và quay lại",
-          "Câu trả lời bám vào dữ liệu của bạn, có nguồn",
-          "Chi phí dự đoán được và chất lượng đo lường được",
-          "Nền tảng bạn sở hữu, không bị phụ thuộc nhà cung cấp",
-        ],
-        useCases: [
-          "Trợ lý chăm sóc khách hàng và bán hàng",
-          "Ứng dụng bạn đồng hành và giáo dục",
-          "Hệ thống tri thức và chuyên gia nội bộ",
-          "Sản xuất nội dung và truyền thông",
-        ],
-        cta: "Trao đổi về sản phẩm AI",
+        cta: "Trao đổi về dự án AI doanh nghiệp",
       },
     ],
   },
@@ -391,7 +349,7 @@ export const vi: Dictionary = {
         title: "Trợ lý ảo doanh nghiệp cho tập đoàn bán lẻ",
         client: "Bán lẻ & tiêu dùng",
         industry: "Bán lẻ",
-        pillar: "ai-solutions",
+        pillar: "ai-enterprise",
         summary: "Trợ lý ảo đa ngôn ngữ trả lời câu hỏi của khách hàng và nhân viên từ tri thức công ty, kết nối với hệ thống nội bộ.",
         challenge: "Đội hỗ trợ xử lý các câu hỏi lặp lại trên nhiều kênh trong khi chính sách và thông tin sản phẩm thay đổi hàng tuần. Chatbot cũ dựa trên luật và nhanh chóng lạc hậu.",
         solution: "Chúng tôi thiết kế trợ lý dựa trên truy xuất với thiết kế hội thoại theo thương hiệu, kết nối nguồn tri thức và API nội bộ, tích hợp đánh giá và chuyển tiếp cho nhân viên.",
@@ -399,21 +357,21 @@ export const vi: Dictionary = {
       },
       {
         slug: "voice-ai-companion",
-        title: "Người bạn ảo giọng nói thời gian thực với avatar khớp khẩu hình",
+        title: "Người bạn ảo giọng nói thời gian thực để luyện hội thoại",
         client: "Ứng dụng tiêu dùng",
-        industry: "Tiêu dùng & giáo dục",
-        pillar: "ai-solutions",
-        summary: "Ứng dụng đồng hành hội thoại bằng giọng nói, nơi người dùng tạo nhân vật với tính cách, giọng nói và avatar động riêng.",
-        challenge: "Mang lại hội thoại giọng nói tự nhiên, độ trễ thấp với avatar video biểu cảm trên iOS, Android và web — với một đội ngũ nhỏ.",
-        solution: "Chúng tôi xây dựng pipeline đa phương thức — nhận dạng giọng nói, suy luận theo nhân vật, tổng hợp giọng nói chất lượng cao và video khớp khẩu hình — sau một trải nghiệm mobile-first để tạo và trò chuyện với nhân vật.",
-        results: ["Phát hành đa nền tảng từ một mã nguồn", "Hội thoại nhất quán theo tính cách với giọng nói tùy chỉnh", "Avatar video đồng bộ với giọng nói sinh ra"],
+        industry: "Giáo dục & tiêu dùng",
+        pillar: "ai-robot",
+        summary: "Ứng dụng đồng hành giọng nói sang giọng nói, nơi người học trò chuyện với nhân vật có tính cách, giọng nói và khuôn mặt động riêng — chính bộ não hội thoại chúng tôi mang vào robot giáo dục.",
+        challenge: "Mang lại hội thoại giọng nói tự nhiên, độ trễ thấp với avatar biểu cảm khớp khẩu hình trên iOS, Android và web — đủ hấp dẫn để người học tiếp tục luyện tập.",
+        solution: "Chúng tôi xây dựng pipeline đa phương thức — nhận dạng giọng nói, suy luận theo nhân vật có rào chắn, tổng hợp giọng nói chất lượng cao và video khớp khẩu hình — sau một trải nghiệm mobile-first để tạo và trò chuyện với nhân vật.",
+        results: ["Phát hành đa nền tảng từ một mã nguồn", "Hội thoại nhất quán theo tính cách với giọng nói tùy chỉnh", "Cùng pipeline nay vận hành hội thoại và gia sư trên robot"],
       },
       {
         slug: "generative-film-pipeline",
         title: "Pipeline sinh ảnh & video cho concept phim",
         client: "Truyền thông & giải trí",
         industry: "Truyền thông",
-        pillar: "ai-solutions",
+        pillar: "ai-enterprise",
         summary: "Pipeline sản xuất biến kịch bản và prompt thành hình ảnh concept nhất quán và các đoạn video ngắn.",
         challenge: "Phát triển concept phim đòi hỏi nhiều vòng lặp hình ảnh và thử chuyển động vốn chậm và tốn kém khi làm theo cách truyền thống.",
         solution: "Chúng tôi xây dựng pipeline điều phối dùng các mô hình sinh ảnh và video tiên tiến với quản lý prompt, nhất quán phong cách và quy trình review cho đội sáng tạo.",
@@ -424,7 +382,7 @@ export const vi: Dictionary = {
         title: "Nền tảng địa lý di sản toàn quốc",
         client: "Văn hóa & du lịch",
         industry: "Công & du lịch",
-        pillar: "ai-solutions",
+        pillar: "ai-enterprise",
         summary: "Danh bạ song ngữ dạng bản đồ với hơn 3.000 địa điểm văn hóa, làm giàu dữ liệu bằng AI và các trang tối ưu tìm kiếm.",
         challenge: "Thông tin địa điểm phân tán trên nhiều nguồn, không nhất quán và không có ở định dạng hiện đại, tìm kiếm được.",
         solution: "Chúng tôi xây dựng pipeline thu thập tự động và làm giàu bằng AI, bản đồ tương tác gom cụm, và hàng nghìn trang song ngữ tĩnh tối ưu cho tìm kiếm và di động.",
@@ -445,10 +403,10 @@ export const vi: Dictionary = {
   },
   about: {
     title: "Về TechHala",
-    subtitle: "Studio kỹ thuật AI xây dựng các hệ thống biết lập kế hoạch, xây dựng, vận hành và nhận thức.",
+    subtitle: "Studio kỹ thuật AI xây dựng trí tuệ cho robot, đội ngũ phần mềm và doanh nghiệp.",
     mission: {
       title: "Sứ mệnh",
-      body: "Biến AI thành một kỷ luật kỹ thuật đáng tin cậy — truy vết được, review được và vận hành thật — trong phần mềm, vận hành và thế giới vật lý.",
+      body: "Biến AI thành một kỷ luật kỹ thuật đáng tin cậy — truy vết được, review được và vận hành thật — dù là dạy một em nhỏ, xây phần mềm hay phục vụ một tổ chức.",
     },
     values: [
       { title: "Truy vết mặc định", body: "Mọi quyết định của AI cần có lý do đọc được và hồ sơ kiểm toán được." },
@@ -460,12 +418,12 @@ export const vi: Dictionary = {
       title: "Câu chuyện",
       paragraphs: [
         "TechHala bắt đầu từ một trăn trở đơn giản: AI có thể viết mã, nhưng không ai giải thích được vì sao nó viết như vậy — hay đủ tin tưởng để phát hành. Chúng tôi bắt tay xây dựng vòng đời còn thiếu quanh AI: lập kế hoạch, kiểm chứng và vận hành.",
-        "Công việc đó trở thành HAL-SDLC, engine vòng đời phát triển phần mềm bằng AI của chúng tôi, và định hình cách chúng tôi tiếp cận mọi bài toán — từ giữ hệ thống production ổn định đến dạy camera và robot hành động theo những gì chúng nhìn thấy.",
+        "Công việc đó trở thành HAL-SDLC, engine vòng đời phát triển phần mềm bằng AI của chúng tôi, và định hình cách chúng tôi tiếp cận mọi bài toán — từ triển khai dịch vụ AI trong doanh nghiệp đến trao cho robot giáo dục một giọng nói biết lắng nghe, hiểu và dạy.",
         "Hôm nay chúng tôi hợp tác với các tổ chức tại Việt Nam và quốc tế để thiết kế, xây dựng và vận hành các hệ thống AI đứng vững trong thế giới thực.",
       ],
     },
     stats: [
-      { value: "4", label: "trụ cột giải pháp" },
+      { value: "3", label: "lĩnh vực trọng tâm" },
       { value: "1", label: "nền tảng chủ lực" },
       { value: "VN + Toàn cầu", label: "khách hàng phục vụ" },
       { value: "100%", label: "bàn giao có con người phê duyệt" },
@@ -479,7 +437,7 @@ export const vi: Dictionary = {
       email: "Email công việc",
       company: "Công ty",
       topic: "Tôi quan tâm đến",
-      topics: ["AI SDLC / HAL-SDLC", "AIOps", "AI Robot & Thị giác", "Giải pháp AI", "Hợp tác", "Khác"],
+      topics: ["AI Robot / Giáo dục", "AI cho SDLC / HAL-SDLC", "AI cho Doanh nghiệp", "Hợp tác", "Khác"],
       message: "Bạn đang làm gì?",
       submit: "Gửi tin nhắn",
       sending: "Đang gửi…",
@@ -494,7 +452,7 @@ export const vi: Dictionary = {
     },
   },
   footer: {
-    tagline: "AI đi vào vận hành — trong phần mềm, vận hành và thế giới vật lý.",
+    tagline: "AI đi vào vận hành — cho robot, đội ngũ phần mềm và doanh nghiệp.",
     solutions: "Giải pháp",
     company: "Công ty",
     rights: "Bảo lưu mọi quyền.",

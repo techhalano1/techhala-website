@@ -3,12 +3,15 @@ import { getDictionary } from "@/content";
 import { localePath, type Locale } from "@/lib/i18n";
 import { Terminal } from "@/components/Terminal";
 import { PillarIcon } from "@/components/PillarIcon";
+import { PillarArt, SdlcIllustration } from "@/components/illustrations";
 import { Arrow, Button, Card, Check, Container, Eyebrow, Heading, Lead, Section } from "@/components/ui";
 
 export default async function Home({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
   const t = getDictionary(locale);
-  const featured = t.work.items.slice(0, 3);
+  const featured = t.solutions.items
+    .map((p) => t.work.items.find((c) => c.pillar === p.slug))
+    .filter((c) => c !== undefined);
 
   return (
     <>
@@ -46,14 +49,17 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
         <Eyebrow>{t.home.pillars.eyebrow}</Eyebrow>
         <Heading>{t.home.pillars.title}</Heading>
         <Lead>{t.home.pillars.subtitle}</Lead>
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
           {t.solutions.items.map((p) => (
             <Link key={p.slug} href={localePath(locale, `/solutions/${p.slug}`)} className="group">
-              <Card className="flex h-full flex-col">
-                <PillarIcon slug={p.slug} />
-                <h3 className="mt-5 text-lg font-semibold">{p.name}</h3>
-                <p className="mt-2 flex-1 text-sm text-muted">{p.tagline}</p>
-                <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-accent">
+              <Card className="flex h-full flex-col p-4">
+                <PillarArt slug={p.slug} title={p.tagline} className="aspect-[3/2]" />
+                <div className="mt-5 flex items-center gap-3 px-2">
+                  <PillarIcon slug={p.slug} className="h-9 w-9" />
+                  <h3 className="text-lg font-semibold">{p.name}</h3>
+                </div>
+                <p className="mt-3 flex-1 px-2 text-sm text-muted">{p.summary}</p>
+                <span className="mt-5 inline-flex items-center gap-1.5 px-2 pb-2 text-sm font-medium text-accent">
                   {t.common.learnMore}
                   <span className="transition group-hover:translate-x-0.5">
                     <Arrow />
@@ -105,13 +111,19 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
               </Button>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            {t.home.product.stats.map((s) => (
-              <div key={s.label} className="rounded-xl border border-border bg-bg-elev p-6">
-                <div className="text-gradient text-4xl font-semibold tracking-tight">{s.value}</div>
-                <div className="mt-1 text-sm text-muted">{s.label}</div>
-              </div>
-            ))}
+          <div>
+            <div className="glow relative overflow-hidden rounded-2xl border border-border bg-bg">
+              <div className="grid-bg pointer-events-none absolute inset-0 opacity-70" aria-hidden="true" />
+              <SdlcIllustration title={t.home.product.title} className="relative aspect-[3/2]" />
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+              {t.home.product.stats.map((s) => (
+                <div key={s.label} className="rounded-xl border border-border bg-bg-elev p-4">
+                  <div className="text-gradient text-2xl font-semibold tracking-tight sm:text-3xl">{s.value}</div>
+                  <div className="mt-1 text-xs text-muted sm:text-sm">{s.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </Section>
@@ -132,11 +144,12 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
         <div className="mt-12 grid gap-5 md:grid-cols-3">
           {featured.map((c) => (
             <Link key={c.slug} href={localePath(locale, `/work/${c.slug}`)} className="group">
-              <Card className="flex h-full flex-col bg-bg">
-                <span className="font-mono text-xs uppercase tracking-wider text-muted">{c.industry}</span>
-                <h3 className="mt-3 text-lg font-semibold leading-snug">{c.title}</h3>
-                <p className="mt-2 flex-1 text-sm text-muted">{c.summary}</p>
-                <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-accent">
+              <Card className="flex h-full flex-col bg-bg p-4">
+                <PillarArt slug={c.pillar} title={c.title} crop className="aspect-[2/1]" />
+                <span className="mt-5 px-2 font-mono text-xs uppercase tracking-wider text-muted">{c.industry}</span>
+                <h3 className="mt-3 px-2 text-lg font-semibold leading-snug">{c.title}</h3>
+                <p className="mt-2 flex-1 px-2 text-sm text-muted">{c.summary}</p>
+                <span className="mt-5 inline-flex items-center gap-1.5 px-2 pb-2 text-sm font-medium text-accent">
                   {t.common.learnMore}
                   <span className="transition group-hover:translate-x-0.5">
                     <Arrow />

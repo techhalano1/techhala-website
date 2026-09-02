@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDictionary, type PillarSlug } from "@/content";
+import { getDictionary, pillarSlugs } from "@/content";
 import { locales, localePath, type Locale } from "@/lib/i18n";
 import { PillarIcon } from "@/components/PillarIcon";
+import { PillarArt } from "@/components/illustrations";
 import { Arrow, Button, Card, Check, Eyebrow, Heading, Lead, Section } from "@/components/ui";
 
 type Params = { locale: Locale; slug: string };
 
 export function generateStaticParams() {
-  const slugs: PillarSlug[] = ["ai-sdlc", "aiops", "ai-robot", "ai-solutions"];
-  return locales.flatMap((locale) => slugs.map((slug) => ({ locale, slug })));
+  return locales.flatMap((locale) => pillarSlugs.map((slug) => ({ locale, slug })));
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -44,16 +44,19 @@ export default async function PillarPage({ params }: { params: Promise<Params> }
             </span>
             {t.solutions.title}
           </Link>
-          <div className="flex items-start gap-5">
-            <PillarIcon slug={p.slug} className="mt-1 h-14 w-14" />
-            <div>
-              <Heading as="h1">{p.name}</Heading>
-              <p className="mt-3 max-w-2xl text-xl sm:text-2xl">{p.tagline}</p>
-              <Lead>{p.summary}</Lead>
-              <div className="mt-8">
-                <Button href={localePath(locale, "/contact")}>{p.cta}</Button>
+          <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr]">
+            <div className="flex items-start gap-5">
+              <PillarIcon slug={p.slug} className="mt-1 hidden h-14 w-14 sm:block" />
+              <div>
+                <Heading as="h1">{p.name}</Heading>
+                <p className="mt-3 max-w-2xl text-xl sm:text-2xl">{p.tagline}</p>
+                <Lead>{p.summary}</Lead>
+                <div className="mt-8">
+                  <Button href={localePath(locale, "/contact")}>{p.cta}</Button>
+                </div>
               </div>
             </div>
+            <PillarArt slug={p.slug} title={p.tagline} className="glow aspect-[3/2] rounded-2xl" />
           </div>
         </Section>
       </div>
@@ -133,10 +136,11 @@ export default async function PillarPage({ params }: { params: Promise<Params> }
           <div className="mt-10 grid gap-5 md:grid-cols-3">
             {related.map((c) => (
               <Link key={c.slug} href={localePath(locale, `/work/${c.slug}`)} className="group">
-                <Card className="h-full">
-                  <span className="font-mono text-xs uppercase tracking-wider text-muted">{c.industry}</span>
-                  <h3 className="mt-3 font-semibold leading-snug">{c.title}</h3>
-                  <p className="mt-2 text-sm text-muted">{c.summary}</p>
+                <Card className="h-full p-4">
+                  <PillarArt slug={c.pillar} title={c.title} crop className="aspect-[2/1]" />
+                  <span className="mt-5 block px-2 font-mono text-xs uppercase tracking-wider text-muted">{c.industry}</span>
+                  <h3 className="mt-3 px-2 font-semibold leading-snug">{c.title}</h3>
+                  <p className="mt-2 px-2 pb-2 text-sm text-muted">{c.summary}</p>
                 </Card>
               </Link>
             ))}
