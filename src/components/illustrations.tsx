@@ -302,9 +302,9 @@ export function SdlcIllustration(props: Props) {
 
           {/* agents under build */}
           <g stroke={line} strokeWidth="1.5" strokeDasharray="3 3">
-            <line x1="185" y1="167" x2="150" y2="206" />
-            <line x1="185" y1="167" x2="185" y2="206" />
-            <line x1="185" y1="167" x2="220" y2="206" />
+            <line x1="185" y1="194" x2="150" y2="206" />
+            <line x1="185" y1="194" x2="185" y2="206" />
+            <line x1="185" y1="194" x2="220" y2="206" />
           </g>
           <Chip x={118} y={206} w={64} label="auth" />
           <Chip x={153} y={238} w={64} label="api" />
