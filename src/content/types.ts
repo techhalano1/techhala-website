@@ -1,4 +1,6 @@
-export type PillarSlug = "ai-sdlc" | "aiops" | "ai-robot" | "ai-solutions";
+export type PillarSlug = "ai-robot" | "ai-sdlc" | "ai-enterprise";
+
+export const pillarSlugs: readonly PillarSlug[] = ["ai-robot", "ai-sdlc", "ai-enterprise"];
 
 export type Pillar = {
   slug: PillarSlug;

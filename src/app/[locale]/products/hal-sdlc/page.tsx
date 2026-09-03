@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getDictionary } from "@/content";
 import { localePath, type Locale } from "@/lib/i18n";
 import { Terminal } from "@/components/Terminal";
+import { PillarArt } from "@/components/illustrations";
 import { Arrow, Button, Card, Check, Container, Eyebrow, Heading, Lead, Section } from "@/components/ui";
 
 export async function generateMetadata({
@@ -43,7 +44,10 @@ export default async function ProductPage({ params }: { params: Promise<{ locale
       </div>
 
       <Section>
-        <Heading>{P.workflow.title}</Heading>
+        <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.2fr]">
+          <Heading>{P.workflow.title}</Heading>
+          <PillarArt slug="ai-sdlc" title={P.workflow.title} className="aspect-[3/2] rounded-2xl" />
+        </div>
         <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {P.workflow.steps.map((s, i) => (
             <li key={s.name} className="rounded-xl border border-border bg-bg-elev p-6">
