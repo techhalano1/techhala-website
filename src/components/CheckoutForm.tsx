@@ -66,6 +66,11 @@ export function CheckoutForm({
           ))}
         </ol>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
+          {state.trackUrl && (
+            <Link href={state.trackUrl} className="kbtn kbtn-accent h-11 px-5 text-sm">
+              {C.success.track}
+            </Link>
+          )}
           <a href={`tel:${company.phoneE164}`} className="kbtn kbtn-ink h-11 px-5 text-sm">
             {shop.callUs} · {company.phoneDisplay}
           </a>

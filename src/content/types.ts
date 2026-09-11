@@ -214,9 +214,34 @@ export type Dictionary = {
       sending: string;
     };
     payments: { id: "cod" | "bank" | "online"; name: string; body: string; available: boolean }[];
-    success: { title: string; body: string; orderCode: string; next: string[] };
+    success: { title: string; body: string; orderCode: string; next: string[]; track: string };
     error: string;
     support: { title: string; body: string };
+  };
+  orders: {
+    title: string;
+    subtitle: string;
+    form: { code: string; phone: string; submit: string; searching: string; notFound: string };
+    detail: {
+      title: string;
+      placedAt: string;
+      status: string;
+      payment: string;
+      paymentStatus: string;
+      items: string;
+      total: string;
+      shipTo: string;
+      note: string;
+      history: string;
+      help: string;
+      bankTitle: string;
+      bankBody: string;
+      transferNote: string;
+      lookupAnother: string;
+    };
+    statuses: Record<"pending" | "confirmed" | "packed" | "shipping" | "delivered" | "cancelled" | "returned", string>;
+    paymentMethods: Record<"cod" | "bank", string>;
+    paymentStatuses: Record<"unpaid" | "paid" | "refunded", string>;
   };
   solutions: {
     title: string;
@@ -284,5 +309,6 @@ export type Dictionary = {
     company: string;
     contact: string;
     rights: string;
+    trackOrder: string;
   };
 };
