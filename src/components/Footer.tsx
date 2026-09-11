@@ -46,6 +46,11 @@ export function Footer({ locale, t }: { locale: Locale; t: Dictionary }) {
                 {t.shop.labels.allProducts}
               </Link>
             </li>
+            <li>
+              <Link href={localePath(locale, "/orders")} className="transition hover:text-fg">
+                {t.footer.trackOrder}
+              </Link>
+            </li>
           </ul>
         </div>
 
