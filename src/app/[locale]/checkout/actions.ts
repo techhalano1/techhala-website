@@ -8,9 +8,11 @@ import { notifyNewOrder } from "@/lib/notify";
 import { transferInfoFor } from "@/lib/payments";
 import type { BankTransferInfo } from "@/components/BankTransferPanel";
 
+export type CustomerFields = { name: string; phone: string; email: string; address: string; note: string };
+
 export type OrderState =
   | { status: "idle" }
-  | { status: "error"; reason?: "out_of_stock" | "too_many"; items?: string }
+  | { status: "error"; reason?: "out_of_stock" | "too_many"; items?: string; customer?: CustomerFields; payment?: string }
   | { status: "success"; orderCode: string; trackUrl?: string; bank?: BankTransferInfo };
 
 const MAX_LINES = 20;
@@ -54,7 +56,7 @@ export async function submitOrder(_prev: OrderState, formData: FormData): Promis
   const payment = String(formData.get("payment") ?? "");
   const locale = String(formData.get("locale") ?? "vi");
 
-  const customer = {
+  const customer: CustomerFields = {
     name: String(formData.get("name") ?? "").trim().slice(0, 120),
     phone: String(formData.get("phone") ?? "").trim().slice(0, 30),
     email: String(formData.get("email") ?? "").trim().slice(0, 200),
@@ -62,8 +64,15 @@ export async function submitOrder(_prev: OrderState, formData: FormData): Promis
     note: String(formData.get("note") ?? "").trim().slice(0, 1000),
   };
 
-  if (!lines || !isPaymentMethod(payment)) return { status: "error" };
-  if (!customer.name || !customer.phone || !customer.address) return { status: "error" };
+  const fail = (extra: Omit<Extract<OrderState, { status: "error" }>, "status" | "customer" | "payment"> = {}): OrderState => ({
+    status: "error",
+    customer,
+    payment,
+    ...extra,
+  });
+
+  if (!lines || !isPaymentMethod(payment)) return fail();
+  if (!customer.name || !customer.phone || !customer.address) return fail();
 
   // Honeypot: real users never see/fill this field. Pretend success so bots stop retrying.
   if (String(formData.get("website") ?? "") !== "") {
@@ -84,7 +93,7 @@ export async function submitOrder(_prev: OrderState, formData: FormData): Promis
 
   try {
     if ((await recentOrderCount(customer.phone)) >= MAX_ORDERS_PER_PHONE_PER_HOUR) {
-      return { status: "error", reason: "too_many" };
+      return fail({ reason: "too_many" });
     }
     const saved = await createOrder(order);
     await notifyNewOrder(order, saved.code, saved.id);
@@ -105,9 +114,9 @@ export async function submitOrder(_prev: OrderState, formData: FormData): Promis
           return `${p?.name ?? s.slug}${color ? ` (${color})` : ""}: ${s.available}/${s.requested}`;
         })
         .join(", ");
-      return { status: "error", reason: "out_of_stock", items };
+      return fail({ reason: "out_of_stock", items });
     }
     console.error("[order] failed to save", err);
-    return { status: "error" };
+    return fail();
   }
 }

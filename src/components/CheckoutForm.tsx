@@ -46,6 +46,8 @@ export function CheckoutForm({
     if (state.status === "success") clear();
   }, [state.status, clear]);
 
+  const prev = state.status === "error" ? state.customer : undefined;
+  const prevPayment = state.status === "error" ? state.payment : undefined;
   const resolved = resolveLines(lines, products);
   const total = resolved.reduce((sum, l) => sum + l.product.price * l.qty, 0);
   const itemCount = resolved.reduce((n, l) => n + l.qty, 0);
@@ -120,24 +122,24 @@ export function CheckoutForm({
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="block text-sm">
             <span className="mb-1.5 block font-semibold">{C.form.name}</span>
-            <input name="name" required autoComplete="name" className={field} />
+            <input name="name" required autoComplete="name" defaultValue={prev?.name} className={field} />
           </label>
           <label className="block text-sm">
             <span className="mb-1.5 block font-semibold">{C.form.phone}</span>
-            <input name="phone" type="tel" required autoComplete="tel" inputMode="tel" className={field} />
+            <input name="phone" type="tel" required autoComplete="tel" inputMode="tel" defaultValue={prev?.phone} className={field} />
           </label>
         </div>
         <label className="block text-sm">
           <span className="mb-1.5 block font-semibold">{C.form.email}</span>
-          <input name="email" type="email" autoComplete="email" className={field} />
+          <input name="email" type="email" autoComplete="email" defaultValue={prev?.email} className={field} />
         </label>
         <label className="block text-sm">
           <span className="mb-1.5 block font-semibold">{C.form.address}</span>
-          <textarea name="address" required rows={2} autoComplete="street-address" className={field} />
+          <textarea name="address" required rows={2} autoComplete="street-address" defaultValue={prev?.address} className={field} />
         </label>
         <label className="block text-sm">
           <span className="mb-1.5 block font-semibold">{C.form.note}</span>
-          <textarea name="note" rows={2} className={field} />
+          <textarea name="note" rows={2} defaultValue={prev?.note} className={field} />
         </label>
 
         <fieldset className="space-y-3">
@@ -153,7 +155,7 @@ export function CheckoutForm({
                 type="radio"
                 name="payment"
                 value={m.id}
-                defaultChecked={i === 0}
+                defaultChecked={prevPayment ? m.id === prevPayment : i === 0}
                 disabled={!m.available}
                 required
                 className="mt-1 accent-[var(--accent)]"
