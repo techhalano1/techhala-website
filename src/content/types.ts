@@ -15,17 +15,48 @@ export type Pillar = {
   cta: string;
 };
 
-export type ProductCategory = "education" | "home";
+export type ProductCategory = "education" | "home" | "combo" | "accessory";
 
-export type ProductArtVariant = "mini" | "buddy" | "pro" | "home" | "care";
+export const productCategories: readonly ProductCategory[] = ["education", "home", "combo", "accessory"];
+
+export type ProductArtVariant =
+  | "mini"
+  | "buddy"
+  | "pro"
+  | "home"
+  | "care"
+  | "combo-siblings"
+  | "combo-study"
+  | "combo-family"
+  | "dock"
+  | "case"
+  | "cards"
+  | "bag"
+  | "premium";
+
+export type ProductTint = "pink" | "yellow" | "blue" | "green" | "purple" | "peach";
+
+export type AgeGroup = "4-8" | "6-12" | "9-15" | "family" | "seniors";
+
+export const ageGroups: readonly AgeGroup[] = ["4-8", "6-12", "9-15", "family", "seniors"];
+
+export type ProductColor = { id: string; name: string; hex: string };
 
 export type Product = {
   slug: string;
   name: string;
   category: ProductCategory;
   art: ProductArtVariant;
+  tint: ProductTint;
   tagline: string;
   price: number;
+  compareAtPrice?: number;
+  rating: number;
+  sold: number;
+  freeShipping: boolean;
+  ages: AgeGroup[];
+  ageLabel?: string;
+  colors?: ProductColor[];
   badge?: string;
   audience: string;
   summary: string;
@@ -84,6 +115,7 @@ export type Dictionary = {
     address: string;
     phone: string;
     categories: Record<ProductCategory, { name: string; short: string }>;
+    ages: Record<AgeGroup, { name: string; short: string }>;
     labels: {
       audience: string;
       highlights: string;
@@ -93,6 +125,40 @@ export type Dictionary = {
       related: string;
       allProducts: string;
       priceNote: string;
+      freeShipping: string;
+      sold: string;
+      reviews: string;
+      save: string;
+      color: string;
+      age: string;
+      inStock: string;
+      filterAll: string;
+      filterCategory: string;
+      filterAge: string;
+      filterPrice: string;
+      sortBy: string;
+      sortOptions: { id: "popular" | "price-asc" | "price-desc" | "rating"; label: string }[];
+      result: string;
+      results: string;
+      noResults: string;
+      clearFilters: string;
+      priceRanges: { id: string; label: string; min: number; max?: number }[];
+    };
+    cart: {
+      title: string;
+      open: string;
+      close: string;
+      empty: string;
+      emptyCta: string;
+      addToCart: string;
+      added: string;
+      remove: string;
+      subtotal: string;
+      shippingFree: string;
+      checkout: string;
+      continueShopping: string;
+      items: string;
+      quantity: string;
     };
     guarantees: { title: string; body: string }[];
   };
@@ -107,8 +173,14 @@ export type Dictionary = {
       bullets: string[];
       priceBadge: string;
     };
+    strip: string[];
+    stats: { value: string; label: string }[];
+    bubbles: { robot: string; child: string };
+    ages: { eyebrow: string; title: string; subtitle: string };
     categories: { eyebrow: string; title: string; subtitle: string };
     catalog: { eyebrow: string; title: string; subtitle: string };
+    bundles: { eyebrow: string; title: string; subtitle: string };
+    testimonials: { eyebrow: string; title: string; items: { quote: string; name: string; role: string }[] };
     why: { eyebrow: string; title: string; subtitle: string; items: { title: string; body: string }[] };
     steps: { eyebrow: string; title: string; subtitle: string; items: { name: string; desc: string }[] };
     family: { eyebrow: string; title: string; body: string; bullets: string[]; cta: string };
@@ -126,6 +198,7 @@ export type Dictionary = {
     subtitle: string;
     noProduct: string;
     chooseProduct: string;
+    addMore: string;
     summary: string;
     quantity: string;
     shipping: string;

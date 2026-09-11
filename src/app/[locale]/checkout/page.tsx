@@ -27,17 +27,20 @@ export default async function CheckoutPage({
 
   return (
     <>
-      <Section className="pb-8 sm:pb-10">
-        <Heading as="h1">{t.checkout.title}</Heading>
+      <Section className="kdots pb-8 pt-12 sm:pb-10 sm:pt-16">
+        <Heading as="h1" className="font-extrabold">
+          {t.checkout.title}
+        </Heading>
         <Lead>{t.checkout.subtitle}</Lead>
       </Section>
-      <Section className="pt-0 sm:pt-0">
+      <Section className="pt-4 sm:pt-6">
         <CheckoutForm
           locale={locale}
           checkout={t.checkout}
           shop={t.shop}
           products={t.products.items}
           initialSlug={product}
+          t={t}
         />
       </Section>
     </>

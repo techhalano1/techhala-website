@@ -1,5 +1,5 @@
-import { useId } from "react";
-import type { ProductArtVariant } from "@/content";
+import { useId, type ReactNode } from "react";
+import type { ProductArtVariant, ProductTint } from "@/content";
 
 const ink = "var(--fg)";
 const accent = "var(--accent)";
@@ -7,7 +7,16 @@ const accent2 = "var(--accent-2)";
 const panel = "var(--bg-elev)";
 const line = "var(--border)";
 
-type Props = { variant: ProductArtVariant; title: string; className?: string };
+type RobotVariant = "mini" | "buddy" | "pro" | "home" | "care";
+
+type Props = {
+  variant: ProductArtVariant;
+  title: string;
+  className?: string;
+  tint?: ProductTint;
+  shell?: string;
+  plain?: boolean;
+};
 
 type Shape = {
   head: { w: number; h: number; rx: number };
@@ -18,7 +27,7 @@ type Shape = {
   wheels: boolean;
 };
 
-const shapes: Record<ProductArtVariant, Shape> = {
+const shapes: Record<RobotVariant, Shape> = {
   mini: { head: { w: 120, h: 96, rx: 40 }, body: { w: 96, h: 64, rx: 30 }, eyes: "happy", ears: true, antenna: true, wheels: false },
   buddy: { head: { w: 140, h: 104, rx: 30 }, body: { w: 108, h: 78, rx: 22 }, eyes: "round", ears: true, antenna: true, wheels: false },
   pro: { head: { w: 160, h: 112, rx: 22 }, body: { w: 120, h: 84, rx: 18 }, eyes: "screen", ears: false, antenna: true, wheels: true },
@@ -78,7 +87,7 @@ function Eyes({ kind, cx, cy, id }: { kind: Shape["eyes"]; cx: number; cy: numbe
   }
 }
 
-function Accessories({ variant, id }: { variant: ProductArtVariant; id: string }) {
+function Accessories({ variant, id }: { variant: RobotVariant; id: string }) {
   switch (variant) {
     case "mini":
       return (
@@ -223,15 +232,216 @@ function Accessories({ variant, id }: { variant: ProductArtVariant; id: string }
   }
 }
 
-export function ProductArt({ variant, title, className = "" }: Props) {
-  const id = `pa-${useId().replace(/\W/g, "")}`;
+function Robot({ variant, id, shell, cx = 240, scale = 1, withAccessories = true }: { variant: RobotVariant; id: string; shell?: string; cx?: number; scale?: number; withAccessories?: boolean }) {
   const s = shapes[variant];
-  const cx = 240;
   const headTop = 96;
   const headX = cx - s.head.w / 2;
   const bodyTop = headTop + s.head.h + 12;
   const bodyX = cx - s.body.w / 2;
   const eyeY = headTop + s.head.h / 2 - 4;
+  const fill = shell ?? panel;
+  const transform = scale === 1 ? undefined : `translate(${cx * (1 - scale)} ${300 * (1 - scale)}) scale(${scale})`;
+
+  return (
+    <g transform={transform}>
+      <ellipse cx={cx} cy="296" rx="140" ry="10" fill={ink} opacity="0.06" />
+      {withAccessories && <Accessories variant={variant} id={id} />}
+
+      {s.antenna && (
+        <>
+          <line x1={cx} y1={headTop - 22} x2={cx} y2={headTop} stroke={ink} strokeWidth="3" opacity="0.5" />
+          <circle cx={cx} cy={headTop - 28} r="7" fill={`url(#${id}-red)`} />
+        </>
+      )}
+
+      <rect x={headX} y={headTop} width={s.head.w} height={s.head.h} rx={s.head.rx} fill={fill} stroke={ink} strokeOpacity="0.25" strokeWidth="2" />
+      <rect x={headX + 16} y={headTop + 16} width={s.head.w - 32} height={s.head.h - 36} rx={Math.max(10, s.head.rx - 12)} fill={ink} opacity="0.92" />
+      <Eyes kind={s.eyes} cx={cx} cy={eyeY} id={id} />
+
+      {s.ears && (
+        <>
+          <rect x={headX - 12} y={headTop + 34} width="12" height="32" rx="6" fill={ink} opacity="0.35" />
+          <rect x={headX + s.head.w} y={headTop + 34} width="12" height="32" rx="6" fill={ink} opacity="0.35" />
+        </>
+      )}
+
+      <rect x={cx - 12} y={headTop + s.head.h} width="24" height="12" fill={ink} opacity="0.35" />
+      <rect x={bodyX} y={bodyTop} width={s.body.w} height={s.body.h} rx={s.body.rx} fill={fill} stroke={ink} strokeOpacity="0.25" strokeWidth="2" />
+      <rect x={cx - 24} y={bodyTop + 18} width="48" height="10" rx="5" fill={accent} opacity="0.85" />
+      <circle cx={cx} cy={bodyTop + 46} r="8" fill="none" stroke={ink} strokeOpacity="0.35" strokeWidth="2" />
+
+      <path d={`M${bodyX} ${bodyTop + 22}q-26 6 -28 40`} stroke={ink} strokeOpacity="0.4" strokeWidth="8" strokeLinecap="round" fill="none" />
+      <path d={`M${bodyX + s.body.w} ${bodyTop + 22}q26 6 28 40`} stroke={ink} strokeOpacity="0.4" strokeWidth="8" strokeLinecap="round" fill="none" />
+      <circle cx={bodyX - 28} cy={bodyTop + 64} r="8" fill={ink} opacity="0.45" />
+      <circle cx={bodyX + s.body.w + 28} cy={bodyTop + 64} r="8" fill={ink} opacity="0.45" />
+
+      {s.wheels ? (
+        <g fill={ink} opacity="0.5">
+          <circle cx={cx - 34} cy={bodyTop + s.body.h + 6} r="10" />
+          <circle cx={cx + 34} cy={bodyTop + s.body.h + 6} r="10" />
+        </g>
+      ) : (
+        <g fill={ink} opacity="0.35">
+          <rect x={cx - 34} y={bodyTop + s.body.h} width="24" height="10" rx="5" />
+          <rect x={cx + 10} y={bodyTop + s.body.h} width="24" height="10" rx="5" />
+        </g>
+      )}
+    </g>
+  );
+}
+
+function Dock({ cx = 240, y = 250 }: { cx?: number; y?: number }) {
+  return (
+    <g>
+      <rect x={cx - 90} y={y} width="180" height="34" rx="14" fill={panel} stroke={ink} strokeWidth="2" strokeOpacity="0.5" />
+      <rect x={cx - 70} y={y + 8} width="140" height="8" rx="4" fill={ink} opacity="0.15" />
+      <circle cx={cx + 72} cy={y + 17} r="4" fill={accent} />
+      <path d={`M${cx + 90} ${y + 17}h40q16 0 16 16v20`} stroke={ink} strokeOpacity="0.4" strokeWidth="3" fill="none" strokeLinecap="round" />
+    </g>
+  );
+}
+
+function Cards({ cx = 240, cy = 190 }: { cx?: number; cy?: number }) {
+  const card = (dx: number, rot: number, fill: string, word: string) => (
+    <g transform={`translate(${cx + dx} ${cy}) rotate(${rot})`} key={word}>
+      <rect x="-56" y="-76" width="112" height="152" rx="12" fill={fill} stroke={ink} strokeWidth="2.5" />
+      <rect x="-40" y="-60" width="80" height="70" rx="8" fill="#fff" stroke={ink} strokeOpacity="0.25" strokeWidth="2" />
+      <text x="0" y="40" textAnchor="middle" fontSize="18" fontWeight="800" fill={ink}>
+        {word}
+      </text>
+      <text x="0" y="60" textAnchor="middle" fontSize="11" fill={ink} opacity="0.6">
+        /{word.toLowerCase()}/
+      </text>
+    </g>
+  );
+  return (
+    <g>
+      {card(-70, -12, "var(--tint-blue)", "CAT")}
+      {card(70, 10, "var(--tint-green)", "SUN")}
+      {card(0, 0, "var(--tint-yellow)", "APPLE")}
+    </g>
+  );
+}
+
+function Case({ id }: { id: string }) {
+  return (
+    <g>
+      <ellipse cx="240" cy="296" rx="120" ry="10" fill={ink} opacity="0.06" />
+      <rect x="150" y="80" width="180" height="190" rx="56" fill="#ff8fa3" stroke={ink} strokeWidth="3" />
+      <rect x="170" y="100" width="140" height="80" rx="32" fill={ink} opacity="0.08" />
+      <circle cx="240" cy="230" r="14" fill="none" stroke={ink} strokeOpacity="0.4" strokeWidth="3" />
+      <rect x="205" y="205" width="70" height="8" rx="4" fill={ink} opacity="0.25" />
+      <circle cx="240" cy="60" r="8" fill={`url(#${id}-red)`} />
+      <g fill={ink} opacity="0.12">
+        <circle cx="150" cy="120" r="6" />
+        <circle cx="330" cy="120" r="6" />
+      </g>
+    </g>
+  );
+}
+
+function Bag() {
+  return (
+    <g>
+      <ellipse cx="240" cy="296" rx="130" ry="10" fill={ink} opacity="0.06" />
+      <path d="M200 120q40 -70 80 0" stroke={ink} strokeWidth="8" fill="none" strokeLinecap="round" />
+      <rect x="130" y="110" width="220" height="170" rx="28" fill="#b39ddb" stroke={ink} strokeWidth="3" />
+      <rect x="130" y="150" width="220" height="6" fill={ink} opacity="0.35" />
+      <rect x="215" y="140" width="50" height="26" rx="8" fill={ink} />
+      <rect x="160" y="190" width="160" height="60" rx="14" fill="#fff" opacity="0.5" stroke={ink} strokeOpacity="0.3" strokeWidth="2" />
+      <path d="M180 220h120" stroke={ink} strokeOpacity="0.4" strokeWidth="3" strokeLinecap="round" />
+      <circle cx="240" cy="220" r="10" fill={accent} />
+    </g>
+  );
+}
+
+function Premium({ id }: { id: string }) {
+  return (
+    <g>
+      <ellipse cx="240" cy="296" rx="150" ry="10" fill={ink} opacity="0.06" />
+      <rect x="120" y="90" width="240" height="160" rx="22" fill={panel} stroke={ink} strokeWidth="3" />
+      <rect x="120" y="90" width="240" height="46" rx="22" fill={`url(#${id}-red)`} />
+      <rect x="120" y="120" width="240" height="16" fill={`url(#${id}-red)`} />
+      <text x="240" y="122" textAnchor="middle" fontSize="20" fontWeight="800" fill="#fff" letterSpacing="2">
+        PREMIUM
+      </text>
+      <g fill={ink} opacity="0.2">
+        <rect x="144" y="156" width="192" height="10" rx="5" />
+        <rect x="144" y="176" width="150" height="10" rx="5" />
+        <rect x="144" y="196" width="170" height="10" rx="5" />
+      </g>
+      <path d="M300 210l14 14 26 -30" stroke={accent} strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M96 70l8 20 20 8 -20 8 -8 20 -8 -20 -20 -8 20 -8z" fill="var(--tint-yellow)" stroke={ink} strokeWidth="2" />
+      <path d="M390 200l6 14 14 6 -14 6 -6 14 -6 -14 -14 -6 14 -6z" fill="var(--tint-yellow)" stroke={ink} strokeWidth="2" />
+    </g>
+  );
+}
+
+export function ProductArt({ variant, title, className = "", tint, shell, plain = false }: Props) {
+  const id = `pa-${useId().replace(/\W/g, "")}`;
+
+  let scene: ReactNode;
+  switch (variant) {
+    case "combo-siblings":
+      scene = (
+        <>
+          <Robot variant="mini" id={id} shell="#ff8fa3" cx={160} scale={0.82} withAccessories={false} />
+          <Robot variant="mini" id={id} shell="#7fd8c8" cx={320} scale={0.82} withAccessories={false} />
+          <path d="M215 150q25 -30 50 0" stroke={accent} strokeWidth="4" fill="none" strokeLinecap="round" strokeDasharray="6 8" />
+        </>
+      );
+      break;
+    case "combo-study":
+      scene = (
+        <>
+          <Dock cx={250} y={262} />
+          <Robot variant="buddy" id={id} shell={shell} cx={250} scale={0.86} withAccessories={false} />
+          <g transform="translate(100 190) rotate(-8) scale(0.6)">
+            <rect x="-56" y="-76" width="112" height="152" rx="12" fill="var(--tint-yellow)" stroke={ink} strokeWidth="3" />
+            <rect x="-40" y="-60" width="80" height="70" rx="8" fill="#fff" stroke={ink} strokeOpacity="0.25" strokeWidth="2" />
+            <text x="0" y="44" textAnchor="middle" fontSize="20" fontWeight="800" fill={ink}>
+              BOOK
+            </text>
+          </g>
+        </>
+      );
+      break;
+    case "combo-family":
+      scene = (
+        <>
+          <Robot variant="home" id={id} cx={160} scale={0.8} withAccessories={false} />
+          <Robot variant="care" id={id} cx={330} scale={0.78} withAccessories={false} />
+          <path d="M205 140q40 -40 80 0" stroke={accent} strokeWidth="4" fill="none" strokeLinecap="round" strokeDasharray="6 8" />
+        </>
+      );
+      break;
+    case "dock":
+      scene = (
+        <>
+          <Dock cx={240} y={236} />
+          <g opacity="0.25">
+            <Robot variant="buddy" id={id} cx={240} scale={0.7} withAccessories={false} />
+          </g>
+          <path d="M240 60v40" stroke={accent} strokeWidth="6" strokeLinecap="round" />
+          <path d="M226 80l14 20 14 -20" stroke={accent} strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        </>
+      );
+      break;
+    case "case":
+      scene = <Case id={id} />;
+      break;
+    case "cards":
+      scene = <Cards />;
+      break;
+    case "bag":
+      scene = <Bag />;
+      break;
+    case "premium":
+      scene = <Premium id={id} />;
+      break;
+    default:
+      scene = <Robot variant={variant} id={id} shell={shell} />;
+  }
 
   return (
     <svg
@@ -252,50 +462,10 @@ export function ProductArt({ variant, title, className = "" }: Props) {
           <stop offset="100%" stopColor={accent2} />
         </linearGradient>
       </defs>
-      <rect width="480" height="320" fill={`url(#${id}-glow)`} />
-      <ellipse cx={cx} cy="296" rx="140" ry="10" fill={ink} opacity="0.06" />
-
-      <Accessories variant={variant} id={id} />
-
-      {s.antenna && (
-        <>
-          <line x1={cx} y1={headTop - 22} x2={cx} y2={headTop} stroke={ink} strokeWidth="3" opacity="0.5" />
-          <circle cx={cx} cy={headTop - 28} r="7" fill={`url(#${id}-red)`} />
-        </>
+      {!plain && (
+        <rect width="480" height="320" fill={tint ? `var(--tint-${tint})` : `url(#${id}-glow)`} />
       )}
-
-      <rect x={headX} y={headTop} width={s.head.w} height={s.head.h} rx={s.head.rx} fill={panel} stroke={ink} strokeOpacity="0.25" strokeWidth="2" />
-      <rect x={headX + 16} y={headTop + 16} width={s.head.w - 32} height={s.head.h - 36} rx={Math.max(10, s.head.rx - 12)} fill={ink} opacity="0.92" />
-      <Eyes kind={s.eyes} cx={cx} cy={eyeY} id={id} />
-
-      {s.ears && (
-        <>
-          <rect x={headX - 12} y={headTop + 34} width="12" height="32" rx="6" fill={ink} opacity="0.35" />
-          <rect x={headX + s.head.w} y={headTop + 34} width="12" height="32" rx="6" fill={ink} opacity="0.35" />
-        </>
-      )}
-
-      <rect x={cx - 12} y={headTop + s.head.h} width="24" height="12" fill={ink} opacity="0.35" />
-      <rect x={bodyX} y={bodyTop} width={s.body.w} height={s.body.h} rx={s.body.rx} fill={panel} stroke={ink} strokeOpacity="0.25" strokeWidth="2" />
-      <rect x={cx - 24} y={bodyTop + 18} width="48" height="10" rx="5" fill={accent} opacity="0.85" />
-      <circle cx={cx} cy={bodyTop + 46} r="8" fill="none" stroke={ink} strokeOpacity="0.35" strokeWidth="2" />
-
-      <path d={`M${bodyX} ${bodyTop + 22}q-26 6 -28 40`} stroke={ink} strokeOpacity="0.4" strokeWidth="8" strokeLinecap="round" fill="none" />
-      <path d={`M${bodyX + s.body.w} ${bodyTop + 22}q26 6 28 40`} stroke={ink} strokeOpacity="0.4" strokeWidth="8" strokeLinecap="round" fill="none" />
-      <circle cx={bodyX - 28} cy={bodyTop + 64} r="8" fill={ink} opacity="0.45" />
-      <circle cx={bodyX + s.body.w + 28} cy={bodyTop + 64} r="8" fill={ink} opacity="0.45" />
-
-      {s.wheels ? (
-        <g fill={ink} opacity="0.5">
-          <circle cx={cx - 34} cy={bodyTop + s.body.h + 6} r="10" />
-          <circle cx={cx + 34} cy={bodyTop + s.body.h + 6} r="10" />
-        </g>
-      ) : (
-        <g fill={ink} opacity="0.35">
-          <rect x={cx - 34} y={bodyTop + s.body.h} width="24" height="10" rx="5" />
-          <rect x={cx + 10} y={bodyTop + s.body.h} width="24" height="10" rx="5" />
-        </g>
-      )}
+      {scene}
     </svg>
   );
 }

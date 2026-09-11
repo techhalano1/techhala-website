@@ -3,13 +3,10 @@
 import { useEffect, useState } from "react";
 
 export function ThemeToggle({ label }: { label: string }) {
-  const [dark, setDark] = useState(true);
+  const [dark, setDark] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    const isDark = stored
-      ? stored === "dark"
-      : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const isDark = localStorage.getItem("theme") === "dark";
     document.documentElement.classList.toggle("dark", isDark);
     setDark(isDark);
   }, []);
