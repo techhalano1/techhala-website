@@ -52,6 +52,13 @@ export const statusActionLabel: Record<OrderStatus, string> = {
   returned: "Khách hoàn trả",
 };
 
+export const categoryLabel: Record<string, string> = {
+  education: "Robot học tập",
+  home: "Robot gia đình",
+  combo: "Combo",
+  accessory: "Phụ kiện",
+};
+
 export function vnd(n: number) {
   return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", maximumFractionDigits: 0 }).format(n);
 }

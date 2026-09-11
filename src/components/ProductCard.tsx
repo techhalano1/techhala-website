@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Dictionary, Product } from "@/content";
 import { localePath, type Locale } from "@/lib/i18n";
 import { formatVnd } from "@/lib/site";
-import { ProductArt } from "@/components/ProductArt";
+import { ProductVisual } from "@/components/ProductVisual";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 
 export function Price({ amount, locale, className = "" }: { amount: number; locale: Locale; className?: string }) {
@@ -46,7 +46,7 @@ export function ProductCard({ product, locale, t, compact = false }: { product: 
   return (
     <article className="kcard kcard-hover group flex h-full flex-col overflow-hidden">
       <Link href={href} className="relative block aspect-[4/3] overflow-hidden border-b-2 border-ink">
-        <ProductArt variant={product.art} tint={product.tint} title={product.name} className="transition duration-300 group-hover:scale-[1.04]" />
+        <ProductVisual product={product} className="transition duration-300 group-hover:scale-[1.04]" />
         <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
           {pct > 0 && (
             <span className="rounded-lg border-2 border-ink bg-accent px-2 py-0.5 font-mono text-[11px] font-bold text-white">−{pct}%</span>

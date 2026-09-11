@@ -1,19 +1,13 @@
 import { listStock } from "@/lib/orders";
-import { catalogColor } from "@/lib/catalog-colors";
-import { vnd } from "@/lib/admin-ui";
+import { colorLookup, getCatalogAll } from "@/lib/catalog";
+import { categoryLabel, vnd } from "@/lib/admin-ui";
 import { StockInForm, SyncCatalogButton } from "@/components/admin/StockForms";
 
 export const metadata = { title: "Kho hàng" };
 
-const categoryLabel: Record<string, string> = {
-  education: "Robot học tập",
-  home: "Robot gia đình",
-  combo: "Combo",
-  accessory: "Phụ kiện",
-};
-
 export default async function AdminInventoryPage() {
-  const stock = await listStock();
+  const [stock, catalog] = await Promise.all([listStock(), getCatalogAll("vi")]);
+  const catalogColor = colorLookup(catalog);
   const variants = stock
     .filter((v) => v.active)
     .map((v) => ({ id: v.variant_id, label: `${v.product_name}${v.color_name ? ` · ${v.color_name}` : ""} (${v.sku})` }));

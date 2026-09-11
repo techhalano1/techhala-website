@@ -22,5 +22,7 @@ export type {
   ProductArtVariant,
   ProductTint,
   ProductColor,
+  ProductImage,
+  ProductVideo,
   AgeGroup,
 } from "./types";

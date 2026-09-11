@@ -189,8 +189,59 @@ begin
   return o;
 end $$;
 
+-- Product content managed from /admin/products. The code catalog (src/content) supplies defaults;
+-- any value stored here overrides it. Products created in admin have source = 'admin'.
+alter table products add column if not exists source            text not null default 'code';
+alter table products add column if not exists compare_at_price  integer check (compare_at_price is null or compare_at_price >= 0);
+alter table products add column if not exists free_shipping     boolean;
+alter table products add column if not exists rating            numeric(2,1) check (rating is null or (rating >= 0 and rating <= 5));
+alter table products add column if not exists sold              integer check (sold is null or sold >= 0);
+alter table products add column if not exists ages              text[];
+alter table products add column if not exists colors            jsonb;
+alter table products add column if not exists art               text;
+alter table products add column if not exists tint              text;
+alter table products add column if not exists video_url         text;
+alter table products add column if not exists sort_order        integer not null default 1000;
+
+create table if not exists product_translations (
+  product_slug  text not null references products(slug) on delete cascade,
+  locale        text not null check (locale in ('vi','en')),
+  name          text,
+  tagline       text,
+  summary       text,
+  audience      text,
+  badge         text,
+  age_label     text,
+  highlights    jsonb,
+  features      jsonb,
+  specs         jsonb,
+  in_box        jsonb,
+  updated_at    timestamptz not null default now(),
+  primary key (product_slug, locale)
+);
+
+-- Images / videos uploaded to the public `products` storage bucket.
+create table if not exists product_media (
+  id            bigserial primary key,
+  product_slug  text not null references products(slug) on delete cascade,
+  kind          text not null check (kind in ('image','video')),
+  url           text not null,
+  storage_path  text,
+  color         text,
+  alt           text,
+  sort_order    integer not null default 0,
+  created_at    timestamptz not null default now()
+);
+create index if not exists product_media_product_idx on product_media(product_slug, sort_order);
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('products', 'products', true, 104857600, array['image/jpeg','image/png','image/webp','image/gif','image/avif','video/mp4','video/webm','video/quicktime'])
+on conflict (id) do update set public = true, file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
+
 -- Lock everything down: the site talks to the DB with the service role only.
 alter table products enable row level security;
+alter table product_translations enable row level security;
+alter table product_media enable row level security;
 alter table variants enable row level security;
 alter table orders enable row level security;
 alter table order_items enable row level security;

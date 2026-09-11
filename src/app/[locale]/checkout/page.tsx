@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getDictionary } from "@/content";
+import { getStoreDictionary } from "@/lib/catalog";
 import { type Locale } from "@/lib/i18n";
 import { CheckoutForm } from "@/components/CheckoutForm";
 import { Heading, Lead, Section } from "@/components/ui";
@@ -23,7 +24,7 @@ export default async function CheckoutPage({
 }) {
   const { locale } = await params;
   const { product } = await searchParams;
-  const t = getDictionary(locale);
+  const t = await getStoreDictionary(locale);
 
   return (
     <>

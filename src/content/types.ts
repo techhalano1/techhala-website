@@ -19,28 +19,36 @@ export type ProductCategory = "education" | "home" | "combo" | "accessory";
 
 export const productCategories: readonly ProductCategory[] = ["education", "home", "combo", "accessory"];
 
-export type ProductArtVariant =
-  | "mini"
-  | "buddy"
-  | "pro"
-  | "home"
-  | "care"
-  | "combo-siblings"
-  | "combo-study"
-  | "combo-family"
-  | "dock"
-  | "case"
-  | "cards"
-  | "bag"
-  | "premium";
+export const productArtVariants = [
+  "mini",
+  "buddy",
+  "pro",
+  "home",
+  "care",
+  "combo-siblings",
+  "combo-study",
+  "combo-family",
+  "dock",
+  "case",
+  "cards",
+  "bag",
+  "premium",
+] as const;
+export type ProductArtVariant = (typeof productArtVariants)[number];
 
-export type ProductTint = "pink" | "yellow" | "blue" | "green" | "purple" | "peach";
+export const productTints = ["pink", "yellow", "blue", "green", "purple", "peach"] as const;
+export type ProductTint = (typeof productTints)[number];
 
 export type AgeGroup = "4-8" | "6-12" | "9-15" | "family" | "seniors";
 
 export const ageGroups: readonly AgeGroup[] = ["4-8", "6-12", "9-15", "family", "seniors"];
 
 export type ProductColor = { id: string; name: string; hex: string };
+
+export type ProductImage = { id: number; url: string; alt?: string; color?: string };
+
+/** Uploaded file (mp4/webm) or an embeddable YouTube / TikTok link. */
+export type ProductVideo = { url: string; kind: "file" | "youtube" | "tiktok" | "link" };
 
 export type Product = {
   slug: string;
@@ -64,6 +72,10 @@ export type Product = {
   features: { title: string; body: string }[];
   specs: { label: string; value: string }[];
   inBox: string[];
+  /** Real photos uploaded from /admin/products; the SVG `art` is the fallback when empty. */
+  images?: ProductImage[];
+  video?: ProductVideo;
+  active?: boolean;
 };
 
 export type CaseStudy = {
@@ -122,6 +134,8 @@ export type Dictionary = {
       features: string;
       specs: string;
       inBox: string;
+      video: string;
+      gallery: string;
       related: string;
       allProducts: string;
       priceNote: string;

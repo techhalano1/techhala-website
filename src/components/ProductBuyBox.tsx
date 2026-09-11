@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Dictionary, Product } from "@/content";
@@ -40,11 +41,20 @@ export function ProductBuyBox({ product: p, locale, t, availability = null }: Pr
       ? L.lowStock.replace("{n}", String(available))
       : L.inStock;
   const ageText = p.ageLabel ?? (p.ages[0] ? t.shop.ages[p.ages[0]].name : undefined);
+  const images = p.images ?? [];
+  const [activeImage, setActiveImage] = useState<number | undefined>(images[0]?.id);
+  const shown = images.find((i) => i.id === activeImage) ?? images[0];
 
   useEffect(() => {
     document.body.classList.add("has-buybar");
     return () => document.body.classList.remove("has-buybar");
   }, []);
+
+  const pickColor = (id: string) => {
+    setColor(id);
+    const match = images.find((i) => i.color === id);
+    if (match) setActiveImage(match.id);
+  };
 
   const buyNow = () => {
     if (soldOut) return;
@@ -57,10 +67,41 @@ export function ProductBuyBox({ product: p, locale, t, availability = null }: Pr
       <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr]">
         <div className="relative">
           <div className="kcard overflow-hidden">
-            <div className="aspect-[4/3]">
-              <ProductArt variant={p.art} tint={p.tint} shell={selectedColor?.hex} title={p.name} />
+            <div className="relative aspect-[4/3]">
+              {shown ? (
+                <Image
+                  key={shown.id}
+                  src={shown.url}
+                  alt={shown.alt || p.name}
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 55vw, 100vw"
+                  className="object-cover"
+                />
+              ) : (
+                <ProductArt variant={p.art} tint={p.tint} shell={selectedColor?.hex} title={p.name} />
+              )}
             </div>
           </div>
+          {images.length > 1 && (
+            <ul className="mt-3 flex gap-2 overflow-x-auto pb-1" aria-label={L.gallery}>
+              {images.map((img) => (
+                <li key={img.id} className="shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setActiveImage(img.id)}
+                    aria-label={img.alt || p.name}
+                    aria-pressed={img.id === shown?.id}
+                    className={`relative block h-16 w-20 overflow-hidden rounded-xl border-2 transition ${
+                      img.id === shown?.id ? "border-accent shadow-hard-accent" : "border-ink opacity-80 hover:opacity-100"
+                    }`}
+                  >
+                    <Image src={img.url} alt="" fill sizes="80px" className="object-cover" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
           <div className="absolute left-4 top-4 flex flex-col items-start gap-2">
             {pct > 0 && <span className="rounded-lg border-2 border-ink bg-accent px-2.5 py-1 font-mono text-xs font-bold text-white">−{pct}%</span>}
             {p.badge && <span className="rounded-lg border-2 border-ink bg-bg-elev px-2.5 py-1 text-xs font-bold">{p.badge}</span>}
@@ -132,7 +173,7 @@ export function ProductBuyBox({ product: p, locale, t, availability = null }: Pr
                         aria-checked={c.id === color}
                         aria-label={out ? `${c.name} — ${L.outOfStock}` : c.name}
                         title={out ? `${c.name} — ${L.outOfStock}` : c.name}
-                        onClick={() => setColor(c.id)}
+                        onClick={() => pickColor(c.id)}
                         className={`relative flex h-10 w-10 items-center justify-center rounded-full border-2 transition ${
                           c.id === color ? "border-ink shadow-hard-sm" : "border-ink/30 hover:border-ink"
                         } ${out ? "opacity-50" : ""}`}

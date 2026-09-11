@@ -1,13 +1,17 @@
 import type { MetadataRoute } from "next";
 import { en } from "@/content/en";
+import { getCatalog } from "@/lib/catalog";
 import { locales } from "@/lib/i18n";
 import { siteUrl } from "@/lib/site";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export const revalidate = 3600;
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const products = await getCatalog("en");
   const paths = [
     "",
     "/products",
-    ...en.products.items.map((p) => `/products/${p.slug}`),
+    ...products.map((p) => `/products/${p.slug}`),
     "/solutions",
     ...en.solutions.items.map((p) => `/solutions/${p.slug}`),
     "/solutions/hal-sdlc",

@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDictionary } from "@/content";
 import { en } from "@/content/en";
+import { getStoreDictionary } from "@/lib/catalog";
 import { locales, localePath, type Locale } from "@/lib/i18n";
 import { company, siteUrl } from "@/lib/site";
 import { getDb } from "@/lib/db";
 import { availabilityForProduct, stockEnforced } from "@/lib/orders";
 import { ProductBuyBox } from "@/components/ProductBuyBox";
 import { ProductCard } from "@/components/ProductCard";
+import { ProductVideo } from "@/components/ProductVideo";
 import { Arrow, Check, Heading, Section } from "@/components/ui";
 
 type Params = { locale: Locale; slug: string };
@@ -21,9 +22,13 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { locale, slug } = await params;
-  const p = getDictionary(locale).products.items.find((x) => x.slug === slug);
+  const p = (await getStoreDictionary(locale)).products.items.find((x) => x.slug === slug);
   if (!p) return {};
-  return { title: p.name, description: `${p.tagline} — ${p.summary}` };
+  return {
+    title: p.name,
+    description: `${p.tagline} — ${p.summary}`,
+    openGraph: p.images?.[0] ? { images: [{ url: p.images[0].url }] } : undefined,
+  };
 }
 
 const tintBg = {
@@ -37,7 +42,7 @@ const tintBg = {
 
 export default async function ProductPage({ params }: { params: Promise<Params> }) {
   const { locale, slug } = await params;
-  const t = getDictionary(locale);
+  const t = await getStoreDictionary(locale);
   const p = t.products.items.find((x) => x.slug === slug);
   if (!p) notFound();
   const L = t.shop.labels;
@@ -53,6 +58,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
     name: p.name,
     description: p.summary,
     brand: { "@type": "Brand", name: company.name },
+    image: p.images?.map((i) => i.url),
     url: `${siteUrl}${localePath(locale, `/products/${p.slug}`)}`,
     offers: {
       "@type": "Offer",
@@ -87,6 +93,17 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
             </li>
           ))}
         </ul>
+
+        {p.video && (
+          <div className="mt-12">
+            <Heading as="h3" className="font-extrabold">
+              {L.video}
+            </Heading>
+            <div className="kcard mt-6 overflow-hidden">
+              <ProductVideo video={p.video} title={p.name} />
+            </div>
+          </div>
+        )}
       </Section>
 
       <Section className={`border-y-2 border-ink ${tintBg[p.tint]}`}>

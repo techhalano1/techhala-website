@@ -6,6 +6,7 @@ import type { Dictionary, Product } from "@/content";
 import { localePath, type Locale } from "@/lib/i18n";
 import { formatVnd } from "@/lib/site";
 import { ProductArt } from "@/components/ProductArt";
+import { ProductVisual } from "@/components/ProductVisual";
 import { lineKey, useCart, type CartLine } from "@/components/cart/CartProvider";
 
 export type ResolvedLine = CartLine & { key: string; product: Product; colorName?: string };
@@ -162,9 +163,9 @@ export function CartDrawer({ locale, t }: { locale: Locale; t: Dictionary }) {
                   <Link
                     href={localePath(locale, `/products/${l.product.slug}`)}
                     onClick={() => setOpen(false)}
-                    className="h-20 w-24 shrink-0 overflow-hidden rounded-xl border-2 border-ink"
+                    className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl border-2 border-ink"
                   >
-                    <ProductArt variant={l.product.art} tint={l.product.tint} title={l.product.name} />
+                    <ProductVisual product={l.product} color={l.color} sizes="96px" />
                   </Link>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
