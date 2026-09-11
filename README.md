@@ -20,8 +20,10 @@ src/app/[locale]/           pages (shop home, products, checkout, solutions, sol
 src/content/{en,vi}.ts      all copy, typed by src/content/types.ts
 src/components/             Nav, Footer, Terminal, ContactForm, ui primitives
 src/app/[locale]/orders/    customer order lookup (code + phone) and tracking page
-src/app/admin/              owner dashboard: orders, status workflow, payments, inventory
+src/app/admin/              owner dashboard: orders, status workflow, products & media, payments, inventory
 src/lib/db.ts, orders.ts    Supabase client (service role, server-only) and order/inventory logic
+src/lib/catalog.ts          live catalog = code defaults (src/content) overlaid with DB edits + uploaded media
+src/lib/products-admin.ts   product/translation/media writes, signed Storage uploads (bucket `products`)
 src/middleware.ts           locale detection + redirect (skips /admin)
 supabase/schema.sql         database schema (tables, variant_stock view, set_order_status())
 ```
@@ -44,6 +46,12 @@ Checkout rejects lines that exceed `available = on_hand - reserved` (variants wi
 Customers track orders at `/{locale}/orders` using order code + phone, or via the tokenized link shown after checkout (also visible in the admin order page to send over Zalo/SMS).
 
 Without Supabase configured, checkout still accepts orders but only logs/notifies them.
+
+### Products, photos & videos (`/admin/products`)
+
+The 13 products in `src/content/{vi,en}.ts` are defaults. Every field (price, compare-at price, badge, VI/EN copy, colours, ages, visibility, sort order) can be overridden from **Sản phẩm** in the admin; edits are stored in `products` / `product_translations` and always win over code — `syncCatalog()` only inserts missing rows. New products can be created there too (`source = 'admin'`; only those can be deleted, code products are hidden instead).
+
+Photos (JPG/PNG/WebP/GIF/AVIF ≤ 10 MB) are uploaded from the browser straight to Supabase Storage bucket `products` (public) via a one-time signed URL issued by a server action, then recorded in `product_media` with optional colour, alt text and display order. The first image is the card/cart thumbnail; images tagged with a colour are shown when that colour is selected. Without uploads the SVG illustration (`art` + `tint`) is used. For video paste a YouTube or TikTok link in the product form — it is embedded (`youtube-nocookie.com`) on the product page; MP4/WebM files ≤ 100 MB can also be uploaded. Storefront pages revalidate on save (`revalidatePath`) so changes appear within about a minute.
 
 ### Payments (VietQR + SePay)
 
@@ -74,10 +82,12 @@ Without `BANK_*` the customer sees a manual notice (quote the order code); witho
 
 New orders are pushed to Telegram when `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` are set, and POSTed as JSON to `ORDER_WEBHOOK_URL` (falls back to `CONTACT_WEBHOOK_URL`). `CONTACT_WEBHOOK_URL` also receives contact-form submissions. All notifications are best effort and never block order creation.
 
-Order webhook payload: `{ type: "order", orderCode, orderId, lines: [{ slug, name, color?, unitPrice, quantity, lineTotal }], payment: "cod" | "bank", customer, locale, submittedAt }`. Prices are recomputed server-side from `src/content/vi.ts`. The cart is client-side only (localStorage key `techhala-cart-v1`).
+Order webhook payload: `{ type: "order", orderCode, orderId, lines: [{ slug, name, color?, unitPrice, quantity, lineTotal }], payment: "cod" | "bank", customer, locale, submittedAt }`. Prices are recomputed server-side from the live catalog (`getCatalog("vi")`). The cart is client-side only (localStorage key `techhala-cart-v1`).
 
 ### Smoke test
 
 `npx tsx --env-file=.env.local scripts/smoke-orders.ts` syncs the catalog, creates and walks an order through the status workflow against the configured database, checks stock movements, then cleans up.
+
+`npx tsx --env-file=.env.local scripts/smoke-products.ts` creates a throw-away product with two colours, uploads a PNG through a signed URL, attaches a YouTube link, checks the merged storefront catalog (translations, images per colour, hide/show, sort, edits surviving `syncCatalog`), then deletes the product and its Storage objects.
 
 `npx tsx --env-file=.env.local scripts/smoke-payments.ts` creates a bank-transfer order, then drives the SePay reconciliation path (outgoing / unknown code / underpaid / exact / duplicate) and asserts payment status and idempotency, then cleans up. With the dev server running, `SMOKE_WEBHOOK_URL=http://localhost:3000/api/webhooks/sepay` additionally exercises the HTTP route (auth + payload validation).

@@ -1,6 +1,6 @@
 import { randomInt } from "node:crypto";
-import { vi } from "@/content/vi";
 import type { Product } from "@/content/types";
+import { getCatalogAll } from "@/lib/catalog";
 import {
   requireDb,
   type Db,
@@ -60,33 +60,31 @@ function skuFor(slug: string, color?: string | null) {
   return color ? `${base}-${color.toUpperCase()}` : base;
 }
 
-function catalogVariants(products: Product[]) {
+export function variantRowsFor(p: Pick<Product, "slug" | "colors">) {
   const rows: Omit<VariantRow, "id" | "created_at">[] = [];
-  for (const p of products) {
-    if (p.colors && p.colors.length > 0) {
-      for (const c of p.colors) {
-        rows.push({ product_slug: p.slug, color: c.id, color_name: c.name, sku: skuFor(p.slug, c.id) });
-      }
-    } else {
-      rows.push({ product_slug: p.slug, color: null, color_name: null, sku: skuFor(p.slug) });
+  if (p.colors && p.colors.length > 0) {
+    for (const c of p.colors) {
+      rows.push({ product_slug: p.slug, color: c.id, color_name: c.name, sku: skuFor(p.slug, c.id) });
     }
+  } else {
+    rows.push({ product_slug: p.slug, color: null, color_name: null, sku: skuFor(p.slug) });
   }
   return rows;
 }
 
-/** Upsert products + variants from the code catalog. Never deletes — retired products are marked inactive. */
+function catalogVariants(products: Product[]) {
+  return products.flatMap(variantRowsFor);
+}
+
+/**
+ * Make sure every catalog product (code defaults + admin-created) has a `products` row and a variant per colour.
+ * Rows that already exist are left untouched so owner edits in /admin/products always win; never deletes.
+ */
 export async function syncCatalog(db: Db = requireDb()) {
-  const products = vi.products.items;
+  const products = await getCatalogAll("vi");
   const { error: pErr } = await db.from("products").upsert(
-    products.map((p) => ({
-      slug: p.slug,
-      name: p.name,
-      category: p.category,
-      price: p.price,
-      active: true,
-      updated_at: new Date().toISOString(),
-    })),
-    { onConflict: "slug" },
+    products.map((p) => ({ slug: p.slug, name: p.name, category: p.category, price: p.price, active: true })),
+    { onConflict: "slug", ignoreDuplicates: true },
   );
   if (pErr) throw pErr;
 
@@ -94,13 +92,6 @@ export async function syncCatalog(db: Db = requireDb()) {
     .from("variants")
     .upsert(catalogVariants(products), { onConflict: "sku", ignoreDuplicates: true });
   if (vErr) throw vErr;
-
-  const slugs = products.map((p) => p.slug);
-  const { error: dErr } = await db
-    .from("products")
-    .update({ active: false })
-    .not("slug", "in", `(${slugs.map((s) => `"${s}"`).join(",")})`);
-  if (dErr) throw dErr;
 
   return { products: products.length, variants: catalogVariants(products).length };
 }

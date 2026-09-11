@@ -72,6 +72,8 @@ export const vi: Dictionary = {
       features: "Tính năng",
       specs: "Thông số",
       inBox: "Trong hộp có gì",
+      video: "Video giới thiệu",
+      gallery: "Ảnh sản phẩm",
       related: "Sản phẩm khác",
       allProducts: "Tất cả sản phẩm",
       priceNote: "Giá đã gồm VAT · Miễn phí giao hàng toàn quốc · Bảo hành 12 tháng",

@@ -10,6 +10,7 @@ export const dynamic = "force-dynamic";
 const nav = [
   { href: "/admin", label: "Tổng quan" },
   { href: "/admin/orders", label: "Đơn hàng" },
+  { href: "/admin/products", label: "Sản phẩm" },
   { href: "/admin/inventory", label: "Kho hàng" },
   { href: "/admin/payments", label: "Thanh toán" },
 ];

@@ -4,7 +4,7 @@ import { getOrderById } from "@/lib/orders";
 import { listTransactionsForOrder } from "@/lib/payments";
 import { sanitizeTransferNote } from "@/lib/vietqr";
 import { siteUrl } from "@/lib/site";
-import { catalogColor } from "@/lib/catalog-colors";
+import { colorLookup, getCatalogAll } from "@/lib/catalog";
 import {
   dateTime,
   paymentMethodLabel,
@@ -20,7 +20,8 @@ export default async function AdminOrderDetail({ params }: { params: Promise<{ i
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
   const order = await getOrderById(id);
   if (!order) notFound();
-  const transactions = await listTransactionsForOrder(order.id);
+  const [transactions, catalog] = await Promise.all([listTransactionsForOrder(order.id), getCatalogAll("vi")]);
+  const catalogColor = colorLookup(catalog);
 
   const trackUrl = `${siteUrl}/${order.locale}/orders/${order.code}?t=${order.access_token}`;
   const phoneDigits = order.customer_phone.replace(/\D/g, "");

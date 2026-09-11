@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { ageGroups, getDictionary } from "@/content";
+import { ageGroups } from "@/content";
+import { getStoreDictionary } from "@/lib/catalog";
 import { localePath, type Locale } from "@/lib/i18n";
 import { company, formatVnd } from "@/lib/site";
 import { ProductArt } from "@/components/ProductArt";
 import { Price, ProductCard, Stars } from "@/components/ProductCard";
+import { ProductVisual } from "@/components/ProductVisual";
 import { SdlcIllustration } from "@/components/illustrations";
 import { Arrow, Check, Container, Eyebrow, Heading, Lead, Section } from "@/components/ui";
 
@@ -17,9 +19,11 @@ const ageTint = {
 
 const ageArt = { "4-8": "mini", "6-12": "buddy", "9-15": "pro", family: "home", seniors: "care" } as const;
 
+export const revalidate = 60;
+
 export default async function Home({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
-  const t = getDictionary(locale);
+  const t = await getStoreDictionary(locale);
   const H = t.home;
   const products = t.products.items;
   const robots = products.filter((p) => p.category === "education" || p.category === "home");
@@ -71,7 +75,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
             <div className="kcard float-y overflow-hidden bg-tint-blue">
               <Link href={localePath(locale, `/products/${hero.slug}`)} className="group block">
                 <div className="relative aspect-[4/3]">
-                  <ProductArt variant={hero.art} tint={hero.tint} title={hero.name} className="transition duration-500 group-hover:scale-[1.03]" />
+                  <ProductVisual product={hero} priority sizes="(min-width: 1024px) 50vw, 100vw" className="transition duration-500 group-hover:scale-[1.03]" />
                   <div className="absolute left-4 top-4 max-w-[62%] rounded-2xl rounded-bl-sm border-2 border-ink bg-bg-elev px-3 py-2 text-sm font-semibold shadow-hard-sm">
                     {H.bubbles.robot}
                   </div>
@@ -195,8 +199,8 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {accessories.map((p) => (
             <Link key={p.slug} href={localePath(locale, `/products/${p.slug}`)} className="kcard kcard-hover group flex items-center gap-3 p-3">
-              <span className="h-16 w-20 shrink-0 overflow-hidden rounded-xl border-2 border-ink">
-                <ProductArt variant={p.art} tint={p.tint} title={p.name} className="transition duration-300 group-hover:scale-105" />
+              <span className="relative h-16 w-20 shrink-0 overflow-hidden rounded-xl border-2 border-ink">
+                <ProductVisual product={p} sizes="80px" className="transition duration-300 group-hover:scale-105" />
               </span>
               <span className="min-w-0">
                 <span className="block truncate text-sm font-bold">{p.name}</span>
@@ -259,8 +263,8 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
           <div className="grid grid-cols-2 gap-4">
             {homeProducts.map((p) => (
               <Link key={p.slug} href={localePath(locale, `/products/${p.slug}`)} className="kcard kcard-hover group overflow-hidden">
-                <div className="aspect-[4/3]">
-                  <ProductArt variant={p.art} tint={p.tint} title={p.name} className="transition duration-300 group-hover:scale-[1.03]" />
+                <div className="relative aspect-[4/3]">
+                  <ProductVisual product={p} sizes="(min-width: 1024px) 25vw, 50vw" className="transition duration-300 group-hover:scale-[1.03]" />
                 </div>
                 <div className="border-t-2 border-ink p-4">
                   <p className="font-extrabold">{p.name}</p>

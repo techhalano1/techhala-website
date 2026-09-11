@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getDictionary } from "@/content";
+import { getStoreDictionary } from "@/lib/catalog";
 import { localePath, type Locale } from "@/lib/i18n";
 import { company, formatVnd } from "@/lib/site";
 import { getDb, type OrderStatus } from "@/lib/db";
@@ -42,7 +43,7 @@ export default async function OrderDetailPage({
 }) {
   const { locale, code } = await params;
   const { t: token } = await searchParams;
-  const t = getDictionary(locale);
+  const t = await getStoreDictionary(locale);
   const D = t.orders.detail;
 
   const lookupUrl = localePath(locale, `/orders?code=${encodeURIComponent(normalizeOrderCode(code))}`);

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { getDictionary } from "@/content";
+import { getStoreDictionary } from "@/lib/catalog";
 import { isLocale, locales, type Locale } from "@/lib/i18n";
 import { company, siteUrl } from "@/lib/site";
 import { Nav } from "@/components/Nav";
@@ -57,7 +58,7 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  const t = getDictionary(locale as Locale);
+  const t = await getStoreDictionary(locale as Locale);
 
   const orgJsonLd = {
     "@context": "https://schema.org",

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getDictionary } from "@/content";
+import { getStoreDictionary } from "@/lib/catalog";
 import { type Locale } from "@/lib/i18n";
 import { company } from "@/lib/site";
 import { ProductCatalog } from "@/components/ProductCatalog";
@@ -25,7 +26,7 @@ export default async function ProductsPage({
 }) {
   const { locale } = await params;
   const { category, age } = await searchParams;
-  const t = getDictionary(locale);
+  const t = await getStoreDictionary(locale);
 
   return (
     <>

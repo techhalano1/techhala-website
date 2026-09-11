@@ -36,8 +36,47 @@ export type ProductRow = {
   category: string;
   price: number;
   active: boolean;
+  source: "code" | "admin";
+  compare_at_price: number | null;
+  free_shipping: boolean | null;
+  rating: number | null;
+  sold: number | null;
+  ages: string[] | null;
+  colors: { id: string; name: string; hex: string }[] | null;
+  art: string | null;
+  tint: string | null;
+  video_url: string | null;
+  sort_order: number;
   created_at: string;
   updated_at: string;
+};
+
+export type ProductTranslationRow = {
+  product_slug: string;
+  locale: string;
+  name: string | null;
+  tagline: string | null;
+  summary: string | null;
+  audience: string | null;
+  badge: string | null;
+  age_label: string | null;
+  highlights: string[] | null;
+  features: { title: string; body: string }[] | null;
+  specs: { label: string; value: string }[] | null;
+  in_box: string[] | null;
+  updated_at: string;
+};
+
+export type ProductMediaRow = {
+  id: number;
+  product_slug: string;
+  kind: "image" | "video";
+  url: string;
+  storage_path: string | null;
+  color: string | null;
+  alt: string | null;
+  sort_order: number;
+  created_at: string;
 };
 
 export type VariantRow = {
@@ -155,6 +194,8 @@ export type Database = {
   public: {
     Tables: {
       products: Table<ProductRow>;
+      product_translations: Table<ProductTranslationRow>;
+      product_media: Table<ProductMediaRow>;
       variants: Table<VariantRow>;
       orders: Table<OrderRow>;
       order_items: Table<OrderItemRow>;

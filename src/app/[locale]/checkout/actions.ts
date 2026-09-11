@@ -1,8 +1,9 @@
 "use server";
 
-import { vi } from "@/content/vi";
-import { en } from "@/content/en";
+import type { Product } from "@/content/types";
+import { getCatalog } from "@/lib/catalog";
 import { getDb, isPaymentMethod } from "@/lib/db";
+import { isLocale } from "@/lib/i18n";
 import { createOrder, makeOrderCode, OutOfStockError, recentOrderCount, type NewOrder, type OrderLine } from "@/lib/orders";
 import { notifyNewOrder } from "@/lib/notify";
 import { transferInfoFor } from "@/lib/payments";
@@ -19,7 +20,7 @@ const MAX_LINES = 20;
 const MAX_QTY = 10;
 const MAX_ORDERS_PER_PHONE_PER_HOUR = Number(process.env.MAX_ORDERS_PER_PHONE_PER_HOUR ?? 5);
 
-function parseLines(raw: string): OrderLine[] | null {
+function parseLines(raw: string, catalog: Product[]): OrderLine[] | null {
   let parsed: unknown;
   try {
     parsed = JSON.parse(raw);
@@ -35,7 +36,7 @@ function parseLines(raw: string): OrderLine[] | null {
     const slug = typeof rec.slug === "string" ? rec.slug : "";
     const qtyRaw = typeof rec.qty === "number" ? rec.qty : Number(rec.qty);
     const color = typeof rec.color === "string" && rec.color ? rec.color : undefined;
-    const product = vi.products.items.find((p) => p.slug === slug);
+    const product = catalog.find((p) => p.slug === slug);
     if (!product || !Number.isFinite(qtyRaw)) return null;
     if (color && !product.colors?.some((c) => c.id === color)) return null;
     const quantity = Math.min(MAX_QTY, Math.max(1, Math.round(qtyRaw)));
@@ -52,9 +53,11 @@ function parseLines(raw: string): OrderLine[] | null {
 }
 
 export async function submitOrder(_prev: OrderState, formData: FormData): Promise<OrderState> {
-  const lines = parseLines(String(formData.get("lines") ?? ""));
   const payment = String(formData.get("payment") ?? "");
-  const locale = String(formData.get("locale") ?? "vi");
+  const localeRaw = String(formData.get("locale") ?? "vi");
+  const locale = isLocale(localeRaw) ? localeRaw : "vi";
+  // Prices/names always come from the live server-side catalog, never from the client.
+  const lines = parseLines(String(formData.get("lines") ?? ""), await getCatalog("vi"));
 
   const customer: CustomerFields = {
     name: String(formData.get("name") ?? "").trim().slice(0, 120),
@@ -106,7 +109,7 @@ export async function submitOrder(_prev: OrderState, formData: FormData): Promis
     };
   } catch (err) {
     if (err instanceof OutOfStockError) {
-      const catalog = (locale === "en" ? en : vi).products.items;
+      const catalog = await getCatalog(locale);
       const items = err.shortages
         .map((s) => {
           const p = catalog.find((x) => x.slug === s.slug);

@@ -6,6 +6,7 @@ import type { Dictionary, Product } from "@/content";
 import { localePath, type Locale } from "@/lib/i18n";
 import { company, formatVnd } from "@/lib/site";
 import { ProductArt } from "@/components/ProductArt";
+import { ProductVisual } from "@/components/ProductVisual";
 import { ProductCard } from "@/components/ProductCard";
 import { useCart } from "@/components/cart/CartProvider";
 import { QtyStepper, resolveLines } from "@/components/cart/CartDrawer";
@@ -181,8 +182,8 @@ export function CheckoutForm({
           <ul className="mt-4 divide-y-2 divide-border">
             {resolved.map((l) => (
               <li key={l.key} className="flex gap-3 py-3">
-                <span className="h-16 w-20 shrink-0 overflow-hidden rounded-xl border-2 border-ink">
-                  <ProductArt variant={l.product.art} tint={l.product.tint} title={l.product.name} />
+                <span className="relative h-16 w-20 shrink-0 overflow-hidden rounded-xl border-2 border-ink">
+                  <ProductVisual product={l.product} color={l.color} sizes="80px" />
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">

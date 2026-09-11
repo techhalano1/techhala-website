@@ -72,6 +72,8 @@ export const en: Dictionary = {
       features: "Features",
       specs: "Specifications",
       inBox: "What's in the box",
+      video: "Product video",
+      gallery: "Product photos",
       related: "Other products",
       allProducts: "All products",
       priceNote: "Prices include VAT · Free nationwide delivery · 12-month warranty",
