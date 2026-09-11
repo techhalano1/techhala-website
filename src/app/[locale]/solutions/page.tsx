@@ -3,8 +3,8 @@ import Link from "next/link";
 import { getDictionary } from "@/content";
 import { localePath, type Locale } from "@/lib/i18n";
 import { PillarIcon } from "@/components/PillarIcon";
-import { PillarArt } from "@/components/illustrations";
-import { Arrow, Button, Card, Heading, Lead, Section } from "@/components/ui";
+import { PillarArt, SdlcIllustration } from "@/components/illustrations";
+import { Arrow, Button, Card, Eyebrow, Heading, Lead, Section } from "@/components/ui";
 
 export async function generateMetadata({
   params,
@@ -19,16 +19,21 @@ export async function generateMetadata({
 export default async function SolutionsPage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
   const t = getDictionary(locale);
+  const order = ["ai-sdlc", "ai-enterprise", "ai-robot"] as const;
+  const items = order.map((slug) => t.solutions.items.find((p) => p.slug === slug)).filter((p) => p !== undefined);
 
   return (
     <>
-      <Section className="pb-10 sm:pb-12">
-        <Heading as="h1">{t.solutions.title}</Heading>
-        <Lead>{t.solutions.subtitle}</Lead>
-      </Section>
-      <Section className="pt-0 sm:pt-0">
+      <div className="relative overflow-hidden border-b border-border">
+        <div className="grid-bg pointer-events-none absolute inset-0" aria-hidden="true" />
+        <Section className="relative">
+          <Heading as="h1">{t.solutions.title}</Heading>
+          <Lead>{t.solutions.subtitle}</Lead>
+        </Section>
+      </div>
+      <Section>
         <div className="grid gap-6 lg:grid-cols-3">
-          {t.solutions.items.map((p) => (
+          {items.map((p) => (
             <Card key={p.slug} className="flex flex-col p-4 sm:p-5">
               <PillarArt slug={p.slug} title={p.tagline} className="aspect-[3/2]" />
               <div className="mt-6 flex items-center gap-4 px-2">
@@ -57,8 +62,27 @@ export default async function SolutionsPage({ params }: { params: Promise<{ loca
             </Card>
           ))}
         </div>
-        <div className="mt-16 text-center">
-          <Button href={localePath(locale, "/contact")}>{t.common.talkToUs}</Button>
+      </Section>
+
+      <Section className="border-t border-border bg-bg-elev/50">
+        <div className="grid items-center gap-10 lg:grid-cols-2">
+          <div className="overflow-hidden rounded-2xl border border-border bg-bg">
+            <SdlcIllustration title={t.solutions.flagship.title} className="aspect-[3/2]" />
+          </div>
+          <div>
+            <Eyebrow>{t.solutions.flagship.eyebrow}</Eyebrow>
+            <Heading>{t.solutions.flagship.title}</Heading>
+            <Lead>{t.solutions.flagship.body}</Lead>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button href={localePath(locale, "/solutions/hal-sdlc")}>
+                {t.solutions.flagship.cta}
+                <Arrow />
+              </Button>
+              <Button href={localePath(locale, "/contact")} variant="secondary">
+                {t.common.talkToUs}
+              </Button>
+            </div>
+          </div>
         </div>
       </Section>
     </>

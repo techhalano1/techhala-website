@@ -39,7 +39,7 @@ export default async function ProductPage({ params }: { params: Promise<{ locale
               </Button>
             </div>
           </div>
-          <Terminal steps={t.home.hero.terminal} />
+          <Terminal steps={t.product.terminal} />
         </Container>
       </div>
 
@@ -74,7 +74,7 @@ export default async function ProductPage({ params }: { params: Promise<{ locale
           ))}
         </div>
         <div className="mt-12 grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {t.home.product.stats.map((s) => (
+          {t.product.stats.map((s) => (
             <div key={s.label} className="rounded-xl border border-border bg-bg p-6 text-center">
               <div className="text-gradient text-3xl font-semibold">{s.value}</div>
               <div className="mt-1 text-sm text-muted">{s.label}</div>

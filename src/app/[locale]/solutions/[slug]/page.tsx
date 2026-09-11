@@ -132,7 +132,7 @@ export default async function PillarPage({ params }: { params: Promise<Params> }
       {related.length > 0 && (
         <Section className="border-t border-border">
           <Eyebrow>{t.nav.work}</Eyebrow>
-          <Heading>{t.home.work.title}</Heading>
+          <Heading>{t.solutions.relatedWork}</Heading>
           <div className="mt-10 grid gap-5 md:grid-cols-3">
             {related.map((c) => (
               <Link key={c.slug} href={localePath(locale, `/work/${c.slug}`)} className="group">
@@ -151,10 +151,16 @@ export default async function PillarPage({ params }: { params: Promise<Params> }
       {/* CTA + other pillars */}
       <Section className="border-t border-border">
         <div className="rounded-2xl border border-border bg-bg-elev p-10 text-center sm:p-14">
-          <Heading>{t.home.cta.title}</Heading>
-          <p className="mx-auto mt-4 max-w-xl text-muted">{t.home.cta.body}</p>
-          <div className="mt-8">
+          <Heading>{t.solutions.cta.title}</Heading>
+          <p className="mx-auto mt-4 max-w-xl text-muted">{t.solutions.cta.body}</p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button href={localePath(locale, "/contact")}>{p.cta}</Button>
+            {p.slug === "ai-robot" && (
+              <Button href={localePath(locale, "/products")} variant="secondary">
+                {t.nav.shopNow}
+                <Arrow />
+              </Button>
+            )}
           </div>
         </div>
         <div className="mt-10 flex flex-wrap justify-center gap-3">

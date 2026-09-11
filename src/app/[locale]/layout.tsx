@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { getDictionary } from "@/content";
 import { isLocale, locales, type Locale } from "@/lib/i18n";
-import { siteUrl } from "@/lib/site";
+import { company, siteUrl } from "@/lib/site";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import "../globals.css";
@@ -60,10 +60,18 @@ export default async function LocaleLayout({
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "TechHala",
+    name: company.name,
     url: siteUrl,
-    email: t.contact.aside.email,
-    sameAs: ["https://github.com/techhalano1"],
+    email: company.email,
+    telephone: company.phoneE164,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: company.addressParts.street,
+      addressLocality: `${company.addressParts.ward}, ${company.addressParts.district}`,
+      addressRegion: company.addressParts.city,
+      addressCountry: company.addressParts.country,
+    },
+    sameAs: [company.github],
     description: t.meta.description,
   };
 

@@ -6,9 +6,11 @@ import { siteUrl } from "@/lib/site";
 export default function sitemap(): MetadataRoute.Sitemap {
   const paths = [
     "",
+    "/products",
+    ...en.products.items.map((p) => `/products/${p.slug}`),
     "/solutions",
     ...en.solutions.items.map((p) => `/solutions/${p.slug}`),
-    "/products/hal-sdlc",
+    "/solutions/hal-sdlc",
     "/work",
     ...en.work.items.map((c) => `/work/${c.slug}`),
     "/about",
@@ -19,8 +21,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     locales.map((locale) => ({
       url: `${siteUrl}/${locale}${path}`,
       lastModified: now,
-      changeFrequency: path === "" ? "weekly" : "monthly",
-      priority: path === "" ? 1 : 0.7,
+      changeFrequency: path === "" || path.startsWith("/products") ? "weekly" : "monthly",
+      priority: path === "" ? 1 : path.startsWith("/products") ? 0.9 : 0.7,
       alternates: {
         languages: Object.fromEntries(locales.map((l) => [l, `${siteUrl}/${l}${path}`])),
       },

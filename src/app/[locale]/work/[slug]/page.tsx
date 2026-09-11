@@ -105,7 +105,7 @@ export default async function CaseStudyPage({ params }: { params: Promise<Params
       </Section>
 
       <Section className="border-t border-border bg-bg-elev/50">
-        <Heading as="h3">{t.home.work.title}</Heading>
+        <Heading as="h3">{t.work.title}</Heading>
         <div className="mt-8 grid gap-5 md:grid-cols-2">
           {more.map((m) => (
             <Link

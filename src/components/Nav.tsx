@@ -14,8 +14,8 @@ export function Nav({ locale, t }: { locale: Locale; t: Dictionary }) {
   const pathname = usePathname();
 
   const links = [
+    { href: localePath(locale, "/products"), label: t.nav.products },
     { href: localePath(locale, "/solutions"), label: t.nav.solutions },
-    { href: localePath(locale, "/products/hal-sdlc"), label: t.nav.product },
     { href: localePath(locale, "/work"), label: t.nav.work },
     { href: localePath(locale, "/about"), label: t.nav.about },
     { href: localePath(locale, "/contact"), label: t.nav.contact },
@@ -48,10 +48,10 @@ export function Nav({ locale, t }: { locale: Locale; t: Dictionary }) {
           <LangSwitch current={locale} label={t.common.language} />
           <ThemeToggle label={t.common.theme} />
           <Link
-            href={localePath(locale, "/contact")}
-            className="ml-1 inline-flex h-9 items-center rounded-md bg-fg px-4 text-sm font-medium text-bg transition hover:opacity-90"
+            href={localePath(locale, "/products")}
+            className="ml-1 inline-flex h-9 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90"
           >
-            {t.nav.bookDemo}
+            {t.nav.shopNow}
           </Link>
         </div>
 
@@ -85,11 +85,11 @@ export function Nav({ locale, t }: { locale: Locale; t: Dictionary }) {
               <LangSwitch current={locale} label={t.common.language} />
               <ThemeToggle label={t.common.theme} />
               <Link
-                href={localePath(locale, "/contact")}
+                href={localePath(locale, "/products")}
                 onClick={() => setOpen(false)}
-                className="ml-auto inline-flex h-9 items-center rounded-md bg-fg px-4 text-sm font-medium text-bg"
+                className="ml-auto inline-flex h-9 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white"
               >
-                {t.nav.bookDemo}
+                {t.nav.shopNow}
               </Link>
             </div>
           </nav>
