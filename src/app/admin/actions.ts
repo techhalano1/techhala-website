@@ -17,6 +17,9 @@ import {
   setOrderStatus,
   syncCatalog,
 } from "@/lib/orders";
+import { matchTransactionToOrder } from "@/lib/payments";
+import { notifyPayment } from "@/lib/notify";
+import { requireDb } from "@/lib/db";
 
 export type LoginState = { error?: string };
 
@@ -60,7 +63,33 @@ export async function recordPayment(_prev: ActionResult | null, formData: FormDa
   const ref = String(formData.get("ref") ?? "").trim();
   if (!orderId || !Number.isFinite(amount) || amount <= 0) return { ok: false, error: "Số tiền không hợp lệ." };
   try {
-    await markOrderPaid(orderId, { provider, amount: Math.round(amount), ref });
+    const paid = await markOrderPaid(orderId, { provider, amount: Math.round(amount), ref });
+    if (!paid) return { ok: false, error: "Đơn này đã được đánh dấu đã thu trước đó." };
+  } catch (err) {
+    return fail(err);
+  }
+  revalidatePath("/admin", "layout");
+  return { ok: true };
+}
+
+/** Owner links an unmatched incoming bank transaction to an order (content had a typo, etc.). */
+export async function matchTransaction(_prev: ActionResult | null, formData: FormData): Promise<ActionResult> {
+  await requireAdmin();
+  const txId = Number(formData.get("txId") ?? 0);
+  const code = String(formData.get("code") ?? "").trim();
+  if (!Number.isInteger(txId) || txId <= 0 || !code) return { ok: false, error: "Thiếu mã đơn." };
+  try {
+    const outcome = await matchTransactionToOrder(txId, code);
+    if (outcome.result === "ignored") {
+      return { ok: false, error: outcome.reason === "order_not_found" ? "Không tìm thấy đơn với mã này." : "Giao dịch không phải tiền vào." };
+    }
+    if (outcome.result === "duplicate") return { ok: false, error: "Giao dịch đã được xử lý." };
+    const { data: tx } = await requireDb().from("bank_transactions").select("*").eq("id", txId).maybeSingle();
+    if (tx && outcome.result === "paid") await notifyPayment(outcome, tx);
+    revalidatePath("/admin", "layout");
+    if (outcome.result === "underpaid") {
+      return { ok: false, error: `Đã gắn giao dịch vào đơn ${outcome.order.code} nhưng còn thiếu ${outcome.missing.toLocaleString("vi-VN")} ₫ — đơn vẫn “Chưa thu”.` };
+    }
   } catch (err) {
     return fail(err);
   }

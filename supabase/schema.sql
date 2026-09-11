@@ -96,6 +96,30 @@ create table if not exists payments (
   created_at    timestamptz not null default now()
 );
 
+-- Raw incoming bank transactions pushed by the payment reconciler (SePay webhook).
+-- (provider, provider_tx_id) is unique so webhook retries are idempotent.
+create table if not exists bank_transactions (
+  id              bigserial primary key,
+  provider        text not null default 'sepay',
+  provider_tx_id  text not null,
+  gateway         text,
+  account_number  text,
+  transfer_type   text not null,
+  amount          integer not null check (amount >= 0),
+  content         text,
+  reference_code  text,
+  transaction_at  timestamptz,
+  order_id        uuid references orders(id) on delete set null,
+  matched_at      timestamptz,
+  created_at      timestamptz not null default now(),
+  unique (provider, provider_tx_id)
+);
+create index if not exists bank_transactions_order_idx on bank_transactions(order_id);
+create index if not exists bank_transactions_created_idx on bank_transactions(created_at desc);
+
+-- Customer pressed "I have transferred" on the tracking page (hint for manual reconciliation).
+alter table orders add column if not exists transfer_reported_at timestamptz;
+
 create table if not exists inventory_movements (
   id          bigserial primary key,
   variant_id  uuid not null references variants(id),
@@ -172,4 +196,5 @@ alter table orders enable row level security;
 alter table order_items enable row level security;
 alter table order_events enable row level security;
 alter table payments enable row level security;
+alter table bank_transactions enable row level security;
 alter table inventory_movements enable row level security;

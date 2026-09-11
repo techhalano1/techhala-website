@@ -124,9 +124,66 @@ async function resolveVariantIds(db: Db, lines: OrderLine[]) {
   });
 }
 
+export class OutOfStockError extends Error {
+  constructor(public readonly shortages: { slug: string; color?: string; requested: number; available: number }[]) {
+    super("insufficient stock");
+  }
+}
+
+/** Backorders are allowed when STOCK_MODE=backorder; otherwise orders are capped at available stock. */
+export function stockEnforced() {
+  return process.env.STOCK_MODE?.toLowerCase() !== "backorder";
+}
+
+/** available per variant id (on_hand - reserved). Missing rows mean no stock history → 0. */
+export async function availabilityFor(variantIds: string[], db: Db = requireDb()) {
+  if (variantIds.length === 0) return new Map<string, number>();
+  const { data, error } = await db
+    .from("variant_stock")
+    .select("variant_id, on_hand, reserved")
+    .in("variant_id", variantIds);
+  if (error) throw error;
+  return new Map(data.map((r) => [r.variant_id, r.on_hand - r.reserved]));
+}
+
+/** available per product slug → color id ("" for colorless) — for the storefront. */
+export async function availabilityForProduct(slug: string, db: Db | null = requireDb()) {
+  if (!db) return null;
+  const { data, error } = await db
+    .from("variant_stock")
+    .select("color, on_hand, reserved")
+    .eq("product_slug", slug);
+  if (error) throw error;
+  const out: Record<string, number> = {};
+  for (const r of data) out[r.color ?? ""] = r.on_hand - r.reserved;
+  return out;
+}
+
+/** Orders placed from `phone` in the last hour — simple abuse brake for the public checkout. */
+export async function recentOrderCount(phone: string, db: Db = requireDb()) {
+  const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const { count, error } = await db
+    .from("orders")
+    .select("id", { count: "exact", head: true })
+    .eq("customer_phone", normalizePhone(phone))
+    .gte("created_at", since);
+  if (error) throw error;
+  return count ?? 0;
+}
+
 export async function createOrder(input: NewOrder): Promise<OrderRow> {
   const db = requireDb();
   const variantIds = await resolveVariantIds(db, input.lines);
+
+  if (stockEnforced()) {
+    const available = await availabilityFor(variantIds, db);
+    const shortages = input.lines.flatMap((l, i) => {
+      const avail = available.get(variantIds[i]) ?? 0;
+      return l.quantity > avail ? [{ slug: l.slug, color: l.color, requested: l.quantity, available: Math.max(0, avail) }] : [];
+    });
+    if (shortages.length > 0) throw new OutOfStockError(shortages);
+  }
+
   const subtotal = input.lines.reduce((s, l) => s + l.lineTotal, 0);
 
   let order: OrderRow | null = null;
@@ -257,8 +314,17 @@ export async function setOrderStatus(orderId: string, status: OrderStatus, note?
   return data;
 }
 
+/** Flip unpaid → paid and record the payment. Returns false (and records nothing) if the order was already paid. */
 export async function markOrderPaid(orderId: string, opts: { provider: string; amount: number; ref?: string }) {
   const db = requireDb();
+  const { data: flipped, error } = await db
+    .from("orders")
+    .update({ payment_status: "paid", updated_at: new Date().toISOString() })
+    .eq("id", orderId)
+    .eq("payment_status", "unpaid")
+    .select("id");
+  if (error) throw error;
+  if (!flipped || flipped.length === 0) return false;
   const { error: pErr } = await db.from("payments").insert({
     order_id: orderId,
     provider: opts.provider,
@@ -267,11 +333,7 @@ export async function markOrderPaid(orderId: string, opts: { provider: string; a
     provider_ref: opts.ref || null,
   });
   if (pErr) throw pErr;
-  const { error } = await db
-    .from("orders")
-    .update({ payment_status: "paid", updated_at: new Date().toISOString() })
-    .eq("id", orderId);
-  if (error) throw error;
+  return true;
 }
 
 export async function setOrderPaymentStatus(orderId: string, status: OrderRow["payment_status"]) {

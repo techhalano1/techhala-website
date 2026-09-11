@@ -10,6 +10,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { useCart } from "@/components/cart/CartProvider";
 import { QtyStepper, resolveLines } from "@/components/cart/CartDrawer";
 import { submitOrder, type OrderState } from "@/app/[locale]/checkout/actions";
+import { BankTransferPanel } from "@/components/BankTransferPanel";
 
 const field =
   "w-full rounded-xl border-2 border-ink bg-bg-elev px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted/70 focus:shadow-hard-accent";
@@ -45,6 +46,8 @@ export function CheckoutForm({
     if (state.status === "success") clear();
   }, [state.status, clear]);
 
+  const prev = state.status === "error" ? state.customer : undefined;
+  const prevPayment = state.status === "error" ? state.payment : undefined;
   const resolved = resolveLines(lines, products);
   const total = resolved.reduce((sum, l) => sum + l.product.price * l.qty, 0);
   const itemCount = resolved.reduce((n, l) => n + l.qty, 0);
@@ -58,13 +61,18 @@ export function CheckoutForm({
         <h2 className="mt-6 text-2xl font-extrabold">{C.success.title}</h2>
         <p className="mt-2 text-muted">{C.success.body}</p>
         <ol className="mx-auto mt-6 max-w-md space-y-2 text-left text-sm text-muted">
-          {C.success.next.map((n, i) => (
+          {(state.bank ? C.success.bankNext : C.success.next).map((n, i) => (
             <li key={n} className="flex gap-3">
               <span className="font-mono font-bold text-accent">{i + 1}.</span>
               {n}
             </li>
           ))}
         </ol>
+        {state.bank && (
+          <div className="mt-6">
+            <BankTransferPanel info={state.bank} locale={locale} labels={t.orders.detail} />
+          </div>
+        )}
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           {state.trackUrl && (
             <Link href={state.trackUrl} className="kbtn kbtn-accent h-11 px-5 text-sm">
@@ -108,29 +116,30 @@ export function CheckoutForm({
     <form action={action} className="grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[1.3fr_1fr]">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="lines" value={linesJson} />
+      <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" defaultValue="" />
 
       <div className="min-w-0 space-y-8">
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="block text-sm">
             <span className="mb-1.5 block font-semibold">{C.form.name}</span>
-            <input name="name" required autoComplete="name" className={field} />
+            <input name="name" required autoComplete="name" defaultValue={prev?.name} className={field} />
           </label>
           <label className="block text-sm">
             <span className="mb-1.5 block font-semibold">{C.form.phone}</span>
-            <input name="phone" type="tel" required autoComplete="tel" inputMode="tel" className={field} />
+            <input name="phone" type="tel" required autoComplete="tel" inputMode="tel" defaultValue={prev?.phone} className={field} />
           </label>
         </div>
         <label className="block text-sm">
           <span className="mb-1.5 block font-semibold">{C.form.email}</span>
-          <input name="email" type="email" autoComplete="email" className={field} />
+          <input name="email" type="email" autoComplete="email" defaultValue={prev?.email} className={field} />
         </label>
         <label className="block text-sm">
           <span className="mb-1.5 block font-semibold">{C.form.address}</span>
-          <textarea name="address" required rows={2} autoComplete="street-address" className={field} />
+          <textarea name="address" required rows={2} autoComplete="street-address" defaultValue={prev?.address} className={field} />
         </label>
         <label className="block text-sm">
           <span className="mb-1.5 block font-semibold">{C.form.note}</span>
-          <textarea name="note" rows={2} className={field} />
+          <textarea name="note" rows={2} defaultValue={prev?.note} className={field} />
         </label>
 
         <fieldset className="space-y-3">
@@ -146,7 +155,7 @@ export function CheckoutForm({
                 type="radio"
                 name="payment"
                 value={m.id}
-                defaultChecked={i === 0}
+                defaultChecked={prevPayment ? m.id === prevPayment : i === 0}
                 disabled={!m.available}
                 required
                 className="mt-1 accent-[var(--accent)]"
@@ -211,7 +220,11 @@ export function CheckoutForm({
 
           {state.status === "error" && (
             <p className="mt-4 text-sm font-semibold text-accent" role="alert">
-              {C.error}
+              {state.reason === "out_of_stock"
+                ? C.errors.outOfStock.replace("{items}", state.items ?? "")
+                : state.reason === "too_many"
+                  ? C.errors.tooMany
+                  : C.error}
             </p>
           )}
 

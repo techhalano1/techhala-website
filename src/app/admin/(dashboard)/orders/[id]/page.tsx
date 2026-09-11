@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getOrderById } from "@/lib/orders";
+import { listTransactionsForOrder } from "@/lib/payments";
+import { sanitizeTransferNote } from "@/lib/vietqr";
 import { siteUrl } from "@/lib/site";
 import { catalogColor } from "@/lib/catalog-colors";
 import {
@@ -18,6 +20,7 @@ export default async function AdminOrderDetail({ params }: { params: Promise<{ i
   if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
   const order = await getOrderById(id);
   if (!order) notFound();
+  const transactions = await listTransactionsForOrder(order.id);
 
   const trackUrl = `${siteUrl}/${order.locale}/orders/${order.code}?t=${order.access_token}`;
   const phoneDigits = order.customer_phone.replace(/\D/g, "");
@@ -161,8 +164,29 @@ export default async function AdminOrderDetail({ params }: { params: Promise<{ i
             <p className="mt-1 text-sm text-muted">{paymentMethodLabel[order.payment_method]}</p>
             {order.payment_method === "bank" && order.payment_status === "unpaid" && (
               <p className="mt-2 rounded-lg bg-tint-yellow px-3 py-2 text-xs">
-                Nội dung CK khách cần ghi: <span className="font-mono font-bold">{order.code}</span>
+                Nội dung CK khách cần ghi: <span className="font-mono font-bold">{sanitizeTransferNote(order.code)}</span>
               </p>
+            )}
+            {order.transfer_reported_at && order.payment_status === "unpaid" && (
+              <p className="mt-2 rounded-lg border-2 border-accent bg-tint-pink px-3 py-2 text-xs font-bold">
+                Khách báo đã chuyển khoản lúc {dateTime(order.transfer_reported_at)} — kiểm tra tài khoản /{" "}
+                <Link href="/admin/payments" className="underline">
+                  giao dịch chưa khớp
+                </Link>
+                .
+              </p>
+            )}
+            {transactions.length > 0 && (
+              <ul className="mt-3 space-y-1 text-xs">
+                {transactions.map((tx) => (
+                  <li key={tx.id} className="flex justify-between gap-2 text-muted">
+                    <span>
+                      {tx.transfer_type === "in" ? "Tiền vào" : "Tiền ra"} · {tx.gateway ?? tx.provider} · {dateTime(tx.transaction_at ?? tx.created_at)}
+                    </span>
+                    <span className="font-mono tabular-nums">{vnd(tx.amount)}</span>
+                  </li>
+                ))}
+              </ul>
             )}
             {order.payments.length > 0 && (
               <ul className="mt-3 space-y-1 text-xs">

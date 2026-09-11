@@ -6,7 +6,10 @@ import { localePath, type Locale } from "@/lib/i18n";
 import { company, formatVnd } from "@/lib/site";
 import { getDb, type OrderStatus } from "@/lib/db";
 import { getOrderByToken, normalizeOrderCode } from "@/lib/orders";
+import { transferInfoFor } from "@/lib/payments";
 import { Heading, Section } from "@/components/ui";
+import { BankTransferPanel } from "@/components/BankTransferPanel";
+import { ReportTransferButton } from "@/components/ReportTransferButton";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +52,8 @@ export default async function OrderDetailPage({
   if (!order) redirect(lookupUrl);
 
   const terminal = order.status === "cancelled" || order.status === "returned";
+  const awaitingTransfer = order.payment_method === "bank" && order.payment_status === "unpaid" && !terminal;
+  const bank = awaitingTransfer ? await transferInfoFor(order.code, order.total) : null;
   const stepIndex = timeline.indexOf(order.status);
   const colorName = (slug: string, color: string | null) =>
     color ? (t.products.items.find((p) => p.slug === slug)?.colors?.find((c) => c.id === color)?.name ?? color) : null;
@@ -97,6 +102,17 @@ export default async function OrderDetailPage({
                 </ol>
               )}
             </div>
+
+            {bank && (
+              <BankTransferPanel info={bank} locale={locale} labels={D}>
+                <ReportTransferButton
+                  code={order.code}
+                  token={token}
+                  alreadyReported={order.transfer_reported_at !== null}
+                  labels={D.bank}
+                />
+              </BankTransferPanel>
+            )}
 
             <div className="kcard p-6">
               <h2 className="text-sm font-bold uppercase tracking-wider text-muted">{D.items}</h2>
@@ -149,12 +165,21 @@ export default async function OrderDetailPage({
               <p className="text-muted">
                 {D.paymentStatus}: {t.orders.paymentStatuses[order.payment_status]}
               </p>
-              {order.payment_method === "bank" && order.payment_status === "unpaid" && !terminal && (
+              {order.payment_method === "bank" && order.payment_status === "paid" && (
+                <p className="mt-3 rounded-lg border-2 border-ink bg-tint-green px-3 py-2 font-bold">{D.bank.paid}</p>
+              )}
+              {awaitingTransfer && !bank && (
                 <div className="mt-4 rounded-xl border-2 border-ink bg-tint-yellow p-4">
                   <p className="font-bold">{D.bankTitle}</p>
-                  <p className="mt-1 text-muted">{D.bankBody}</p>
+                  <p className="mt-1 text-muted">{D.bankBodyManual}</p>
                   <p className="mt-3 text-xs font-bold uppercase tracking-wider text-muted">{D.transferNote}</p>
                   <p className="font-mono text-base font-extrabold">{order.code}</p>
+                  <ReportTransferButton
+                    code={order.code}
+                    token={token}
+                    alreadyReported={order.transfer_reported_at !== null}
+                    labels={D.bank}
+                  />
                 </div>
               )}
             </div>
