@@ -12,4 +12,4 @@ export function getDictionary(locale: string): Dictionary {
 }
 
 export { pillarSlugs } from "./types";
-export type { Dictionary, Pillar, CaseStudy, PillarSlug } from "./types";
+export type { Dictionary, Pillar, CaseStudy, PillarSlug, Product, ProductCategory, ProductArtVariant } from "./types";

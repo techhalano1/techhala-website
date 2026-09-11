@@ -31,7 +31,7 @@ export function ContactForm({ locale, t }: { locale: Locale; t: Dictionary["cont
         </label>
         <label className="block text-sm">
           <span className="mb-1.5 block text-muted">{t.email}</span>
-          <input name="email" type="email" required autoComplete="email" className={field} />
+          <input name="email" type="text" required autoComplete="email" inputMode="email" className={field} />
         </label>
       </div>
       <div className="grid gap-5 sm:grid-cols-2">

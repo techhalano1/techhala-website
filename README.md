@@ -16,7 +16,7 @@ npm run build && npm run start
 ## Structure
 
 ```
-src/app/[locale]/           pages (home, solutions, products/hal-sdlc, work, about, contact)
+src/app/[locale]/           pages (shop home, products, checkout, solutions, solutions/hal-sdlc, work, about, contact)
 src/content/{en,vi}.ts      all copy, typed by src/content/types.ts
 src/components/             Nav, Footer, Terminal, ContactForm, ui primitives
 src/middleware.ts           locale detection + redirect
@@ -24,4 +24,4 @@ src/middleware.ts           locale detection + redirect
 
 ## Configuration
 
-See `.env.example`. `CONTACT_WEBHOOK_URL` receives contact-form submissions as JSON; without it, submissions are only logged server-side.
+See `.env.example`. `CONTACT_WEBHOOK_URL` receives contact-form submissions and `ORDER_WEBHOOK_URL` receives checkout orders as JSON; without them, submissions are only logged server-side.
