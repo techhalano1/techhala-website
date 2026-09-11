@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { locales, swapLocale, type Locale } from "@/lib/i18n";
 
-export function LangSwitch({ current, label }: { current: Locale; label: string }) {
+type Props = { current: Locale; label: string };
+
+function Switch({ current, label, suffix }: Props & { suffix: string }) {
   const pathname = usePathname();
   return (
     <div
@@ -15,7 +18,7 @@ export function LangSwitch({ current, label }: { current: Locale; label: string 
       {locales.map((l) => (
         <Link
           key={l}
-          href={swapLocale(pathname, l)}
+          href={`${swapLocale(pathname, l)}${suffix}`}
           hrefLang={l}
           aria-current={l === current ? "true" : undefined}
           className={`rounded px-2.5 py-1 uppercase transition ${
@@ -26,5 +29,18 @@ export function LangSwitch({ current, label }: { current: Locale; label: string 
         </Link>
       ))}
     </div>
+  );
+}
+
+function QuerySwitch(props: Props) {
+  const query = useSearchParams().toString();
+  return <Switch {...props} suffix={query ? `?${query}` : ""} />;
+}
+
+export function LangSwitch(props: Props) {
+  return (
+    <Suspense fallback={<Switch {...props} suffix="" />}>
+      <QuerySwitch {...props} />
+    </Suspense>
   );
 }
