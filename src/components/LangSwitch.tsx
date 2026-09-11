@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import { locales, swapLocale, type Locale } from "@/lib/i18n";
+import {
+  locales,
+  rememberLocale,
+  swapLocale,
+  type Locale,
+} from "@/lib/i18n";
 
 type Props = { current: Locale; label: string };
 
@@ -20,6 +25,7 @@ function Switch({ current, label, suffix }: Props & { suffix: string }) {
           key={l}
           href={`${swapLocale(pathname, l)}${suffix}`}
           hrefLang={l}
+          onClick={() => rememberLocale(l)}
           aria-current={l === current ? "true" : undefined}
           className={`rounded px-2.5 py-1 uppercase transition ${
             l === current ? "bg-fg text-bg" : "text-muted hover:text-fg"
