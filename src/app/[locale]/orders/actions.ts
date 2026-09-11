@@ -3,7 +3,24 @@
 import { redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n";
 import { getDb } from "@/lib/db";
-import { findOrderByCodeAndPhone } from "@/lib/orders";
+import { findOrderByCodeAndPhone, getOrderByToken } from "@/lib/orders";
+import { reportTransfer } from "@/lib/payments";
+import { notifyTransferReported } from "@/lib/notify";
+
+/** Customer says "I have transferred" — only for the token holder of an unpaid bank order. */
+export async function reportTransferAction(code: string, token: string): Promise<{ ok: boolean }> {
+  if (!code || !token || !getDb()) return { ok: false };
+  try {
+    const order = await getOrderByToken(code, token);
+    if (!order) return { ok: false };
+    const updated = await reportTransfer(order.id);
+    if (updated) await notifyTransferReported(updated);
+    return { ok: true };
+  } catch (err) {
+    console.error("[orders] reportTransfer failed", err);
+    return { ok: false };
+  }
+}
 
 export type LookupState = { status: "idle" } | { status: "not_found" };
 

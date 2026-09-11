@@ -12,14 +12,33 @@ import { QtyStepper } from "@/components/cart/CartDrawer";
 import { useCart } from "@/components/cart/CartProvider";
 import { useRouter } from "next/navigation";
 
-export function ProductBuyBox({ product: p, locale, t }: { product: Product; locale: Locale; t: Dictionary }) {
+type Props = {
+  product: Product;
+  locale: Locale;
+  t: Dictionary;
+  /** Available units per colour id ("" for colourless products); null = stock unknown / not enforced. */
+  availability?: Record<string, number> | null;
+};
+
+const LOW_STOCK_AT = 5;
+
+export function ProductBuyBox({ product: p, locale, t, availability = null }: Props) {
   const L = t.shop.labels;
-  const [color, setColor] = useState(p.colors?.[0]?.id);
+  const availableFor = (c: string | undefined) => (availability ? (availability[c ?? ""] ?? 0) : null);
+  const firstInStock = p.colors?.find((c) => (availableFor(c.id) ?? 1) > 0)?.id ?? p.colors?.[0]?.id;
+  const [color, setColor] = useState(firstInStock);
   const [qty, setQty] = useState(1);
   const { add } = useCart();
   const router = useRouter();
   const pct = discountPercent(p);
   const selectedColor = p.colors?.find((c) => c.id === color);
+  const available = availableFor(color);
+  const soldOut = available !== null && available <= 0;
+  const stockLabel = soldOut
+    ? L.outOfStock
+    : available !== null && available <= LOW_STOCK_AT
+      ? L.lowStock.replace("{n}", String(available))
+      : L.inStock;
   const ageText = p.ageLabel ?? (p.ages[0] ? t.shop.ages[p.ages[0]].name : undefined);
 
   useEffect(() => {
@@ -28,6 +47,7 @@ export function ProductBuyBox({ product: p, locale, t }: { product: Product; loc
   }, []);
 
   const buyNow = () => {
+    if (soldOut) return;
     add({ slug: p.slug, color, qty }, false);
     router.push(localePath(locale, "/checkout"));
   };
@@ -73,7 +93,13 @@ export function ProductBuyBox({ product: p, locale, t }: { product: Product; loc
             <span className="text-muted">
               · {formatSold(p.sold, locale)} {L.sold}
             </span>
-            <span className="rounded-md bg-tint-green px-1.5 py-0.5 text-xs font-bold text-[#0d6b3a]">{L.inStock}</span>
+            <span
+              className={`rounded-md px-1.5 py-0.5 text-xs font-bold ${
+                soldOut ? "bg-tint-pink text-accent" : available !== null && available <= LOW_STOCK_AT ? "bg-tint-yellow" : "bg-tint-green text-[#0d6b3a]"
+              }`}
+            >
+              {stockLabel}
+            </span>
           </div>
 
           <div className="mt-6 rounded-2xl border-2 border-ink bg-bg-elev p-5">
@@ -96,29 +122,40 @@ export function ProductBuyBox({ product: p, locale, t }: { product: Product; loc
                   {L.color}: <span className="font-semibold text-muted">{selectedColor?.name}</span>
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label={L.color}>
-                  {p.colors.map((c) => (
-                    <button
-                      key={c.id}
-                      type="button"
-                      role="radio"
-                      aria-checked={c.id === color}
-                      aria-label={c.name}
-                      onClick={() => setColor(c.id)}
-                      className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition ${
-                        c.id === color ? "border-ink shadow-hard-sm" : "border-ink/30 hover:border-ink"
-                      }`}
-                    >
-                      <span className="h-6 w-6 rounded-full border border-ink/20" style={{ background: c.hex }} />
-                    </button>
-                  ))}
+                  {p.colors.map((c) => {
+                    const out = (availableFor(c.id) ?? 1) <= 0;
+                    return (
+                      <button
+                        key={c.id}
+                        type="button"
+                        role="radio"
+                        aria-checked={c.id === color}
+                        aria-label={out ? `${c.name} — ${L.outOfStock}` : c.name}
+                        title={out ? `${c.name} — ${L.outOfStock}` : c.name}
+                        onClick={() => setColor(c.id)}
+                        className={`relative flex h-10 w-10 items-center justify-center rounded-full border-2 transition ${
+                          c.id === color ? "border-ink shadow-hard-sm" : "border-ink/30 hover:border-ink"
+                        } ${out ? "opacity-50" : ""}`}
+                      >
+                        <span className="h-6 w-6 rounded-full border border-ink/20" style={{ background: c.hex }} />
+                        {out && <span aria-hidden className="absolute h-0.5 w-8 rotate-45 bg-ink" />}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
             <div className="mt-5 flex flex-wrap items-center gap-3">
               <span className="text-sm font-bold">{t.shop.cart.quantity}</span>
-              <QtyStepper qty={qty} onChange={(q) => setQty(Math.max(1, q))} label={t.shop.cart.quantity} />
+              <QtyStepper
+                qty={qty}
+                onChange={(q) => setQty(Math.min(Math.max(1, q), available ?? Number.MAX_SAFE_INTEGER))}
+                label={t.shop.cart.quantity}
+              />
             </div>
+
+            {soldOut && <p className="mt-4 rounded-lg bg-tint-pink px-3 py-2 text-sm font-semibold">{L.outOfStockHint}</p>}
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               <AddToCartButton
@@ -129,8 +166,9 @@ export function ProductBuyBox({ product: p, locale, t }: { product: Product; loc
                 addedLabel={t.shop.cart.added}
                 variant="ink"
                 className="h-12 text-base"
+                disabled={soldOut}
               />
-              <button type="button" onClick={buyNow} className="kbtn kbtn-accent h-12 text-base">
+              <button type="button" onClick={buyNow} disabled={soldOut} className="kbtn kbtn-accent h-12 text-base disabled:cursor-not-allowed disabled:opacity-50">
                 {t.shop.buyNow} →
               </button>
             </div>
@@ -167,10 +205,17 @@ export function ProductBuyBox({ product: p, locale, t }: { product: Product; loc
               addedLabel={t.shop.cart.added}
               variant="ink"
               className="h-10 px-3 text-sm"
+              disabled={soldOut}
             />
-            <Link href={localePath(locale, "/checkout")} onClick={() => add({ slug: p.slug, color, qty }, false)} className="kbtn kbtn-accent h-10 px-3 text-sm">
-              {t.shop.buyNow}
-            </Link>
+            {soldOut ? (
+              <span className="kbtn kbtn-accent h-10 cursor-not-allowed px-3 text-sm opacity-50" aria-disabled>
+                {L.outOfStock}
+              </span>
+            ) : (
+              <Link href={localePath(locale, "/checkout")} onClick={() => add({ slug: p.slug, color, qty }, false)} className="kbtn kbtn-accent h-10 px-3 text-sm">
+                {t.shop.buyNow}
+              </Link>
+            )}
           </div>
         </div>
       </div>

@@ -10,6 +10,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { useCart } from "@/components/cart/CartProvider";
 import { QtyStepper, resolveLines } from "@/components/cart/CartDrawer";
 import { submitOrder, type OrderState } from "@/app/[locale]/checkout/actions";
+import { BankTransferPanel } from "@/components/BankTransferPanel";
 
 const field =
   "w-full rounded-xl border-2 border-ink bg-bg-elev px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted/70 focus:shadow-hard-accent";
@@ -58,13 +59,18 @@ export function CheckoutForm({
         <h2 className="mt-6 text-2xl font-extrabold">{C.success.title}</h2>
         <p className="mt-2 text-muted">{C.success.body}</p>
         <ol className="mx-auto mt-6 max-w-md space-y-2 text-left text-sm text-muted">
-          {C.success.next.map((n, i) => (
+          {(state.bank ? C.success.bankNext : C.success.next).map((n, i) => (
             <li key={n} className="flex gap-3">
               <span className="font-mono font-bold text-accent">{i + 1}.</span>
               {n}
             </li>
           ))}
         </ol>
+        {state.bank && (
+          <div className="mt-6">
+            <BankTransferPanel info={state.bank} locale={locale} labels={t.orders.detail} />
+          </div>
+        )}
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           {state.trackUrl && (
             <Link href={state.trackUrl} className="kbtn kbtn-accent h-11 px-5 text-sm">
@@ -108,6 +114,7 @@ export function CheckoutForm({
     <form action={action} className="grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[1.3fr_1fr]">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="lines" value={linesJson} />
+      <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" defaultValue="" />
 
       <div className="min-w-0 space-y-8">
         <div className="grid gap-5 sm:grid-cols-2">
@@ -211,7 +218,11 @@ export function CheckoutForm({
 
           {state.status === "error" && (
             <p className="mt-4 text-sm font-semibold text-accent" role="alert">
-              {C.error}
+              {state.reason === "out_of_stock"
+                ? C.errors.outOfStock.replace("{items}", state.items ?? "")
+                : state.reason === "too_many"
+                  ? C.errors.tooMany
+                  : C.error}
             </p>
           )}
 

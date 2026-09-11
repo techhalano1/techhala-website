@@ -132,6 +132,9 @@ export type Dictionary = {
       color: string;
       age: string;
       inStock: string;
+      lowStock: string;
+      outOfStock: string;
+      outOfStockHint: string;
       filterAll: string;
       filterCategory: string;
       filterAge: string;
@@ -214,8 +217,9 @@ export type Dictionary = {
       sending: string;
     };
     payments: { id: "cod" | "bank" | "online"; name: string; body: string; available: boolean }[];
-    success: { title: string; body: string; orderCode: string; next: string[]; track: string };
+    success: { title: string; body: string; orderCode: string; next: string[]; bankNext: string[]; track: string };
     error: string;
+    errors: { outOfStock: string; tooMany: string };
     support: { title: string; body: string };
   };
   orders: {
@@ -236,8 +240,23 @@ export type Dictionary = {
       help: string;
       bankTitle: string;
       bankBody: string;
+      bankBodyManual: string;
       transferNote: string;
       lookupAnother: string;
+      bank: {
+        scan: string;
+        bank: string;
+        accountNo: string;
+        accountName: string;
+        amount: string;
+        copy: string;
+        copied: string;
+        auto: string;
+        report: string;
+        reporting: string;
+        reported: string;
+        paid: string;
+      };
     };
     statuses: Record<"pending" | "confirmed" | "packed" | "shipping" | "delivered" | "cancelled" | "returned", string>;
     paymentMethods: Record<"cod" | "bank", string>;

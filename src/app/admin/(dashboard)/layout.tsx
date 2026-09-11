@@ -11,6 +11,7 @@ const nav = [
   { href: "/admin", label: "Tổng quan" },
   { href: "/admin/orders", label: "Đơn hàng" },
   { href: "/admin/inventory", label: "Kho hàng" },
+  { href: "/admin/payments", label: "Thanh toán" },
 ];
 
 export default async function AdminDashboardLayout({ children }: { children: ReactNode }) {

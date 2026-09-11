@@ -12,9 +12,10 @@ type Props = {
   className?: string;
   variant?: "accent" | "ink" | "white";
   openDrawer?: boolean;
+  disabled?: boolean;
 };
 
-export function AddToCartButton({ slug, color, qty = 1, label, addedLabel, className = "", variant = "accent", openDrawer = true }: Props) {
+export function AddToCartButton({ slug, color, qty = 1, label, addedLabel, className = "", variant = "accent", openDrawer = true, disabled = false }: Props) {
   const { add } = useCart();
   const [added, setAdded] = useState(false);
 
@@ -31,7 +32,8 @@ export function AddToCartButton({ slug, color, qty = 1, label, addedLabel, class
         add({ slug, color, qty }, openDrawer);
         setAdded(true);
       }}
-      className={`kbtn kbtn-${variant} ${className}`}
+      disabled={disabled}
+      className={`kbtn kbtn-${variant} disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       aria-live="polite"
     >
       {added ? (

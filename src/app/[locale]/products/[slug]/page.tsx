@@ -5,11 +5,15 @@ import { getDictionary } from "@/content";
 import { en } from "@/content/en";
 import { locales, localePath, type Locale } from "@/lib/i18n";
 import { company, siteUrl } from "@/lib/site";
+import { getDb } from "@/lib/db";
+import { availabilityForProduct, stockEnforced } from "@/lib/orders";
 import { ProductBuyBox } from "@/components/ProductBuyBox";
 import { ProductCard } from "@/components/ProductCard";
 import { Arrow, Check, Heading, Section } from "@/components/ui";
 
 type Params = { locale: Locale; slug: string };
+
+export const revalidate = 60;
 
 export function generateStaticParams() {
   return locales.flatMap((locale) => en.products.items.map((p) => ({ locale, slug: p.slug })));
@@ -37,6 +41,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   const p = t.products.items.find((x) => x.slug === slug);
   if (!p) notFound();
   const L = t.shop.labels;
+  const availability = stockEnforced() ? await availabilityForProduct(slug, getDb()).catch(() => null) : null;
   const related = [
     ...t.products.items.filter((x) => x.slug !== p.slug && x.category === p.category),
     ...t.products.items.filter((x) => x.slug !== p.slug && x.category !== p.category),
@@ -53,7 +58,10 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
       "@type": "Offer",
       price: p.price,
       priceCurrency: "VND",
-      availability: "https://schema.org/InStock",
+      availability:
+        availability && Object.values(availability).every((n) => n <= 0)
+          ? "https://schema.org/OutOfStock"
+          : "https://schema.org/InStock",
       seller: { "@type": "Organization", name: company.name, telephone: company.phoneE164 },
     },
   };
@@ -69,7 +77,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
           </span>
           {L.allProducts}
         </Link>
-        <ProductBuyBox product={p} locale={locale} t={t} />
+        <ProductBuyBox product={p} locale={locale} t={t} availability={availability} />
 
         <ul className="mt-10 grid gap-3 sm:grid-cols-2">
           {p.highlights.map((h) => (

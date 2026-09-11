@@ -1,17 +1,21 @@
 "use server";
 
 import { vi } from "@/content/vi";
+import { en } from "@/content/en";
 import { getDb, isPaymentMethod } from "@/lib/db";
-import { createOrder, makeOrderCode, type NewOrder, type OrderLine } from "@/lib/orders";
+import { createOrder, makeOrderCode, OutOfStockError, recentOrderCount, type NewOrder, type OrderLine } from "@/lib/orders";
 import { notifyNewOrder } from "@/lib/notify";
+import { transferInfoFor } from "@/lib/payments";
+import type { BankTransferInfo } from "@/components/BankTransferPanel";
 
 export type OrderState =
   | { status: "idle" }
-  | { status: "error" }
-  | { status: "success"; orderCode: string; trackUrl?: string };
+  | { status: "error"; reason?: "out_of_stock" | "too_many"; items?: string }
+  | { status: "success"; orderCode: string; trackUrl?: string; bank?: BankTransferInfo };
 
 const MAX_LINES = 20;
 const MAX_QTY = 10;
+const MAX_ORDERS_PER_PHONE_PER_HOUR = Number(process.env.MAX_ORDERS_PER_PHONE_PER_HOUR ?? 5);
 
 function parseLines(raw: string): OrderLine[] | null {
   let parsed: unknown;
@@ -61,25 +65,48 @@ export async function submitOrder(_prev: OrderState, formData: FormData): Promis
   if (!lines || !isPaymentMethod(payment)) return { status: "error" };
   if (!customer.name || !customer.phone || !customer.address) return { status: "error" };
 
+  // Honeypot: real users never see/fill this field. Pretend success so bots stop retrying.
+  if (String(formData.get("website") ?? "") !== "") {
+    return { status: "success", orderCode: makeOrderCode() };
+  }
+
   const order: NewOrder = { lines, payment, customer, locale };
+  const total = lines.reduce((s, l) => s + l.lineTotal, 0);
 
   if (!getDb()) {
     // No database configured: fall back to notification-only (webhook / log).
     const code = makeOrderCode();
     console.info(`[order] ${code} not persisted (Supabase not configured); ${lines.length} line(s), ${payment}`);
     await notifyNewOrder(order, code, null);
-    return { status: "success", orderCode: code };
+    const bank = payment === "bank" ? await transferInfoFor(code, total) : null;
+    return { status: "success", orderCode: code, bank: bank ?? undefined };
   }
 
   try {
+    if ((await recentOrderCount(customer.phone)) >= MAX_ORDERS_PER_PHONE_PER_HOUR) {
+      return { status: "error", reason: "too_many" };
+    }
     const saved = await createOrder(order);
     await notifyNewOrder(order, saved.code, saved.id);
+    const bank = payment === "bank" ? await transferInfoFor(saved.code, saved.total) : null;
     return {
       status: "success",
       orderCode: saved.code,
       trackUrl: `/${locale}/orders/${saved.code}?t=${saved.access_token}`,
+      bank: bank ?? undefined,
     };
   } catch (err) {
+    if (err instanceof OutOfStockError) {
+      const catalog = (locale === "en" ? en : vi).products.items;
+      const items = err.shortages
+        .map((s) => {
+          const p = catalog.find((x) => x.slug === s.slug);
+          const color = s.color ? p?.colors?.find((c) => c.id === s.color)?.name : undefined;
+          return `${p?.name ?? s.slug}${color ? ` (${color})` : ""}: ${s.available}/${s.requested}`;
+        })
+        .join(", ");
+      return { status: "error", reason: "out_of_stock", items };
+    }
     console.error("[order] failed to save", err);
     return { status: "error" };
   }

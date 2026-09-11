@@ -1,10 +1,16 @@
 import Link from "next/link";
 import { listOrders, listStock, orderStats } from "@/lib/orders";
+import { listBankTransactions } from "@/lib/payments";
 import { dateTime, paymentMethodLabel, statusLabel, statusTone, vnd } from "@/lib/admin-ui";
 import { orderStatuses } from "@/lib/db";
 
 export default async function AdminHome() {
-  const [stats, recent, stock] = await Promise.all([orderStats(), listOrders({ limit: 8 }), listStock()]);
+  const [stats, recent, stock, unmatched] = await Promise.all([
+    orderStats(),
+    listOrders({ limit: 8 }),
+    listStock(),
+    listBankTransactions({ unmatchedOnly: true, limit: 50 }),
+  ]);
   const totalOnHand = stock.reduce((s, v) => s + v.on_hand, 0);
   const totalReserved = stock.reduce((s, v) => s + v.reserved, 0);
   const totalSold = stock.reduce((s, v) => s + v.sold, 0);
@@ -20,6 +26,9 @@ export default async function AdminHome() {
     { label: "Đã bán (xuất kho)", value: totalSold, href: "/admin/inventory", tone: "bg-tint-green" },
     { label: "Tiền đã thu", value: vnd(stats.paidTotal), href: "/admin/orders", tone: "bg-tint-blue" },
   ];
+  if (unmatched.length > 0) {
+    cards.unshift({ label: "Tiền vào chưa khớp đơn", value: unmatched.length, href: "/admin/payments", tone: "bg-tint-pink" });
+  }
 
   return (
     <div className="space-y-8">

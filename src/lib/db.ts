@@ -66,6 +66,7 @@ export type OrderRow = {
   shipping_fee: number;
   total: number;
   locale: string;
+  transfer_reported_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -99,6 +100,22 @@ export type PaymentRow = {
   status: PaymentStatus;
   provider_ref: string | null;
   paid_at: string;
+  created_at: string;
+};
+
+export type BankTransactionRow = {
+  id: number;
+  provider: string;
+  provider_tx_id: string;
+  gateway: string | null;
+  account_number: string | null;
+  transfer_type: string;
+  amount: number;
+  content: string | null;
+  reference_code: string | null;
+  transaction_at: string | null;
+  order_id: string | null;
+  matched_at: string | null;
   created_at: string;
 };
 
@@ -143,6 +160,7 @@ export type Database = {
       order_items: Table<OrderItemRow>;
       order_events: Table<OrderEventRow>;
       payments: Table<PaymentRow>;
+      bank_transactions: Table<BankTransactionRow>;
       inventory_movements: Table<InventoryMovementRow>;
     };
     Views: {
