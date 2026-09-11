@@ -61,10 +61,10 @@ export function CheckoutForm({
   }
 
   return (
-    <form action={action} className="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
+    <form action={action} className="grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[1.3fr_1fr]">
       <input type="hidden" name="locale" value={locale} />
 
-      <div className="space-y-8">
+      <div className="min-w-0 space-y-8">
         <fieldset className="space-y-3">
           <legend className="mb-2 text-sm font-semibold">{C.chooseProduct}</legend>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -148,7 +148,7 @@ export function CheckoutForm({
         </fieldset>
       </div>
 
-      <aside className="lg:sticky lg:top-24 lg:self-start">
+      <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
         <div className="rounded-2xl border border-border bg-bg-elev p-6">
           <h2 className="font-semibold">{C.summary}</h2>
           {product ? (
