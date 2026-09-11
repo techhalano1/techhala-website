@@ -93,6 +93,7 @@ export const vi: Dictionary = {
         { id: "price-desc", label: "Giá cao → thấp" },
         { id: "rating", label: "Đánh giá cao" },
       ],
+      result: "sản phẩm",
       results: "sản phẩm",
       noResults: "Không có sản phẩm phù hợp bộ lọc. Thử bỏ bớt bộ lọc nhé.",
       clearFilters: "Xoá bộ lọc",

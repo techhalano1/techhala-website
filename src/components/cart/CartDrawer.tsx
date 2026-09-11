@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import type { Dictionary, Product } from "@/content";
 import { localePath, type Locale } from "@/lib/i18n";
 import { formatVnd } from "@/lib/site";
@@ -64,10 +64,41 @@ export function CartDrawer({ locale, t }: { locale: Locale; t: Dictionary }) {
   const subtotal = resolved.reduce((sum, l) => sum + l.product.price * l.qty, 0);
   const c = t.shop.cart;
 
+  const panelRef = useRef<HTMLElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     if (!open) return;
+    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    closeRef.current?.focus();
+
+    const focusable = () =>
+      Array.from(
+        panelRef.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      );
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        setOpen(false);
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const items = focusable();
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      if (!panelRef.current?.contains(active)) {
+        e.preventDefault();
+        first.focus();
+      } else if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", onKey);
     const prev = document.body.style.overflow;
@@ -75,6 +106,7 @@ export function CartDrawer({ locale, t }: { locale: Locale; t: Dictionary }) {
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
+      previouslyFocused?.focus();
     };
   }, [open, setOpen]);
 
@@ -88,6 +120,7 @@ export function CartDrawer({ locale, t }: { locale: Locale; t: Dictionary }) {
         tabIndex={open ? 0 : -1}
       />
       <aside
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={c.title}
@@ -99,6 +132,7 @@ export function CartDrawer({ locale, t }: { locale: Locale; t: Dictionary }) {
             <span className="ml-1 rounded-full bg-accent px-2 py-0.5 font-mono text-xs text-white">{count}</span>
           </h2>
           <button
+            ref={closeRef}
             type="button"
             onClick={() => setOpen(false)}
             className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-ink transition hover:bg-bg-elev"

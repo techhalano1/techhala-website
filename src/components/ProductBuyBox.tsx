@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Dictionary, Product } from "@/content";
 import { localePath, type Locale } from "@/lib/i18n";
 import { company } from "@/lib/site";
@@ -21,6 +21,11 @@ export function ProductBuyBox({ product: p, locale, t }: { product: Product; loc
   const pct = discountPercent(p);
   const selectedColor = p.colors?.find((c) => c.id === color);
   const ageText = p.ageLabel ?? (p.ages[0] ? t.shop.ages[p.ages[0]].name : undefined);
+
+  useEffect(() => {
+    document.body.classList.add("has-buybar");
+    return () => document.body.classList.remove("has-buybar");
+  }, []);
 
   const buyNow = () => {
     add({ slug: p.slug, color, qty }, false);

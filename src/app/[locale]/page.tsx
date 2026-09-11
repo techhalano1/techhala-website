@@ -120,7 +120,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
         </div>
         <div className="mt-10 grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {ageGroups.map((a) => {
-            const count = products.filter((p) => p.ages.includes(a) && p.category !== "accessory").length;
+            const count = products.filter((p) => p.ages.includes(a)).length;
             return (
               <Link
                 key={a}
@@ -134,7 +134,7 @@ export default async function Home({ params }: { params: Promise<{ locale: Local
                   <p className="text-lg font-extrabold">{t.shop.ages[a].name}</p>
                   <p className="mt-1 line-clamp-2 text-xs text-muted">{t.shop.ages[a].short}</p>
                   <p className="mt-2 text-xs font-bold text-accent">
-                    {count} {t.shop.labels.results} →
+                    {count} {count === 1 ? t.shop.labels.result : t.shop.labels.results} →
                   </p>
                 </div>
               </Link>

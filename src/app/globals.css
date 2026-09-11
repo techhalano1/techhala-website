@@ -183,6 +183,12 @@ body {
   animation: float-y 4s ease-in-out infinite;
 }
 
+@media (max-width: 1023px) {
+  body.has-buybar {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+}
+
 .text-gradient {
   background: linear-gradient(120deg, var(--accent), var(--accent-2));
   -webkit-background-clip: text;

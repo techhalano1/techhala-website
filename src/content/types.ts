@@ -138,6 +138,7 @@ export type Dictionary = {
       filterPrice: string;
       sortBy: string;
       sortOptions: { id: "popular" | "price-asc" | "price-desc" | "rating"; label: string }[];
+      result: string;
       results: string;
       noResults: string;
       clearFilters: string;

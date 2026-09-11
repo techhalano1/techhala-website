@@ -93,6 +93,7 @@ export const en: Dictionary = {
         { id: "price-desc", label: "Price: high → low" },
         { id: "rating", label: "Top rated" },
       ],
+      result: "product",
       results: "products",
       noResults: "No products match these filters. Try removing one.",
       clearFilters: "Clear filters",

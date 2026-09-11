@@ -94,7 +94,7 @@ export function ProductCatalog({
       <div className="min-w-0">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-muted" aria-live="polite">
-            <span className="font-mono text-base font-extrabold text-fg">{filtered.length}</span> {L.results}
+            <span className="font-mono text-base font-extrabold text-fg">{filtered.length}</span> {filtered.length === 1 ? L.result : L.results}
           </p>
           <label className="flex items-center gap-2 text-sm">
             <span className="font-semibold">{L.sortBy}</span>
