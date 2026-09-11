@@ -8,12 +8,14 @@ import { isLocale, locales, type Locale } from "@/lib/i18n";
 import { company, siteUrl } from "@/lib/site";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
+import { CartProvider } from "@/components/cart/CartProvider";
+import { CartDrawer } from "@/components/cart/CartDrawer";
 import "../globals.css";
 
 const inter = Inter({ subsets: ["latin", "vietnamese"], variable: "--font-sans" });
 const mono = JetBrains_Mono({ subsets: ["latin", "vietnamese"], variable: "--font-mono" });
 
-const themeInit = `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){document.documentElement.classList.add('dark');}})();`;
+const themeInit = `(function(){try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`;
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -90,9 +92,12 @@ export default async function LocaleLayout({
         />
       </head>
       <body className="flex min-h-screen flex-col">
-        <Nav locale={locale} t={t} />
-        <main className="flex-1">{children}</main>
-        <Footer locale={locale} t={t} />
+        <CartProvider>
+          <Nav locale={locale} t={t} />
+          <main className="flex-1">{children}</main>
+          <Footer locale={locale} t={t} />
+          <CartDrawer locale={locale} t={t} />
+        </CartProvider>
         <Analytics />
       </body>
     </html>

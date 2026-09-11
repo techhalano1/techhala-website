@@ -1,0 +1,174 @@
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import type { Dictionary, Product } from "@/content";
+import { localePath, type Locale } from "@/lib/i18n";
+import { company } from "@/lib/site";
+import { ProductArt } from "@/components/ProductArt";
+import { ComparePrice, Price, Stars, discountPercent, formatSold } from "@/components/ProductCard";
+import { AddToCartButton } from "@/components/cart/AddToCartButton";
+import { QtyStepper } from "@/components/cart/CartDrawer";
+import { useCart } from "@/components/cart/CartProvider";
+import { useRouter } from "next/navigation";
+
+export function ProductBuyBox({ product: p, locale, t }: { product: Product; locale: Locale; t: Dictionary }) {
+  const L = t.shop.labels;
+  const [color, setColor] = useState(p.colors?.[0]?.id);
+  const [qty, setQty] = useState(1);
+  const { add } = useCart();
+  const router = useRouter();
+  const pct = discountPercent(p);
+  const selectedColor = p.colors?.find((c) => c.id === color);
+  const ageText = p.ageLabel ?? (p.ages[0] ? t.shop.ages[p.ages[0]].name : undefined);
+
+  const buyNow = () => {
+    add({ slug: p.slug, color, qty }, false);
+    router.push(localePath(locale, "/checkout"));
+  };
+
+  return (
+    <>
+      <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr]">
+        <div className="relative">
+          <div className="kcard overflow-hidden">
+            <div className="aspect-[4/3]">
+              <ProductArt variant={p.art} tint={p.tint} shell={selectedColor?.hex} title={p.name} />
+            </div>
+          </div>
+          <div className="absolute left-4 top-4 flex flex-col items-start gap-2">
+            {pct > 0 && <span className="rounded-lg border-2 border-ink bg-accent px-2.5 py-1 font-mono text-xs font-bold text-white">−{pct}%</span>}
+            {p.badge && <span className="rounded-lg border-2 border-ink bg-bg-elev px-2.5 py-1 text-xs font-bold">{p.badge}</span>}
+          </div>
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {t.shop.guarantees.map((g) => (
+              <div key={g.title} className="rounded-xl border-2 border-ink bg-bg-elev p-3 text-center">
+                <p className="text-xs font-bold leading-tight">{g.title}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted">
+            <span>{t.shop.categories[p.category].name}</span>
+            {ageText && (
+              <>
+                <span aria-hidden>·</span>
+                <span className="rounded-md bg-tint-yellow px-1.5 py-0.5 normal-case tracking-normal text-fg">{ageText}</span>
+              </>
+            )}
+          </div>
+          <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-balance sm:text-5xl">{p.name}</h1>
+          <p className="mt-3 text-lg text-muted">{p.tagline}</p>
+
+          <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+            <Stars rating={p.rating} className="[&>svg]:h-4 [&>svg]:w-4" />
+            <span className="font-bold">{p.rating.toFixed(1)}</span>
+            <span className="text-muted">
+              · {formatSold(p.sold, locale)} {L.sold}
+            </span>
+            <span className="rounded-md bg-tint-green px-1.5 py-0.5 text-xs font-bold text-[#0d6b3a]">{L.inStock}</span>
+          </div>
+
+          <div className="mt-6 rounded-2xl border-2 border-ink bg-bg-elev p-5">
+            <div className="flex flex-wrap items-baseline gap-3">
+              <Price amount={p.price} locale={locale} className="text-4xl" />
+              {p.compareAtPrice && (
+                <>
+                  <ComparePrice amount={p.compareAtPrice} locale={locale} className="text-base" />
+                  <span className="rounded-md border-2 border-ink bg-tint-pink px-2 py-0.5 text-xs font-bold">
+                    {L.save} {pct}%
+                  </span>
+                </>
+              )}
+            </div>
+            <p className="mt-1 text-xs text-muted">{L.priceNote}</p>
+
+            {p.colors && p.colors.length > 0 && (
+              <div className="mt-5">
+                <p className="text-sm font-bold">
+                  {L.color}: <span className="font-semibold text-muted">{selectedColor?.name}</span>
+                </p>
+                <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label={L.color}>
+                  {p.colors.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={c.id === color}
+                      aria-label={c.name}
+                      onClick={() => setColor(c.id)}
+                      className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition ${
+                        c.id === color ? "border-ink shadow-hard-sm" : "border-ink/30 hover:border-ink"
+                      }`}
+                    >
+                      <span className="h-6 w-6 rounded-full border border-ink/20" style={{ background: c.hex }} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <span className="text-sm font-bold">{t.shop.cart.quantity}</span>
+              <QtyStepper qty={qty} onChange={(q) => setQty(Math.max(1, q))} label={t.shop.cart.quantity} />
+            </div>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <AddToCartButton
+                slug={p.slug}
+                color={color}
+                qty={qty}
+                label={t.shop.cart.addToCart}
+                addedLabel={t.shop.cart.added}
+                variant="ink"
+                className="h-12 text-base"
+              />
+              <button type="button" onClick={buyNow} className="kbtn kbtn-accent h-12 text-base">
+                {t.shop.buyNow} →
+              </button>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+              <a href={`tel:${company.phoneE164}`} className="font-semibold text-accent hover:underline">
+                {t.shop.callUs} · {company.phoneDisplay}
+              </a>
+              <a href={company.zaloUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-accent hover:underline">
+                {t.shop.zalo}
+              </a>
+            </div>
+          </div>
+
+          <dl className="mt-6 text-sm">
+            <dt className="text-xs font-bold uppercase tracking-wider text-muted">{L.audience}</dt>
+            <dd className="mt-1 font-semibold">{p.audience}</dd>
+          </dl>
+          <p className="mt-4 text-muted">{p.summary}</p>
+        </div>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t-2 border-ink bg-bg/95 backdrop-blur lg:hidden">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
+          <div className="min-w-0">
+            <p className="truncate text-sm font-bold">{p.name}</p>
+            <Price amount={p.price} locale={locale} />
+          </div>
+          <div className="flex shrink-0 gap-2">
+            <AddToCartButton
+              slug={p.slug}
+              color={color}
+              qty={qty}
+              label={t.shop.cart.addToCart}
+              addedLabel={t.shop.cart.added}
+              variant="ink"
+              className="h-10 px-3 text-sm"
+            />
+            <Link href={localePath(locale, "/checkout")} onClick={() => add({ slug: p.slug, color, qty }, false)} className="kbtn kbtn-accent h-10 px-3 text-sm">
+              {t.shop.buyNow}
+            </Link>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}

@@ -11,5 +11,16 @@ export function getDictionary(locale: string): Dictionary {
   return dictionaries[locale];
 }
 
-export { pillarSlugs } from "./types";
-export type { Dictionary, Pillar, CaseStudy, PillarSlug, Product, ProductCategory, ProductArtVariant } from "./types";
+export { pillarSlugs, productCategories, ageGroups } from "./types";
+export type {
+  Dictionary,
+  Pillar,
+  CaseStudy,
+  PillarSlug,
+  Product,
+  ProductCategory,
+  ProductArtVariant,
+  ProductTint,
+  ProductColor,
+  AgeGroup,
+} from "./types";
