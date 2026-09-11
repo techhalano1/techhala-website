@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { locales, swapLocale, type Locale } from "@/lib/i18n";
+import {
+  locales,
+  rememberLocale,
+  swapLocale,
+  type Locale,
+} from "@/lib/i18n";
 
 export function LangSwitch({ current, label }: { current: Locale; label: string }) {
   const pathname = usePathname();
@@ -17,6 +22,7 @@ export function LangSwitch({ current, label }: { current: Locale; label: string 
           key={l}
           href={swapLocale(pathname, l)}
           hrefLang={l}
+          onClick={() => rememberLocale(l)}
           aria-current={l === current ? "true" : undefined}
           className={`rounded px-2.5 py-1 uppercase transition ${
             l === current ? "bg-fg text-bg" : "text-muted hover:text-fg"

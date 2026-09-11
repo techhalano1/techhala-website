@@ -1,8 +1,20 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { defaultLocale, isLocale, type Locale } from "@/lib/i18n";
+import {
+  LOCALE_COOKIE,
+  LOCALE_COOKIE_MAX_AGE,
+  defaultLocale,
+  isLocale,
+  type Locale,
+} from "@/lib/i18n";
 
-const LOCALE_COOKIE = "locale";
-const ONE_YEAR = 60 * 60 * 24 * 365;
+// Only full document navigations count as a locale choice; client-side
+// router requests (RSC, prefetch) persist the choice via `rememberLocale`.
+function isDocumentNavigation(request: NextRequest) {
+  const h = request.headers;
+  const dest = h.get("sec-fetch-dest");
+  if (dest) return dest === "document";
+  return h.get("accept")?.includes("text/html") === true;
+}
 
 function pickLocale(request: NextRequest): Locale {
   const saved = request.cookies.get(LOCALE_COOKIE)?.value;
@@ -15,11 +27,15 @@ export function middleware(request: NextRequest) {
 
   if (first && isLocale(first)) {
     const response = NextResponse.next();
-    if (request.cookies.get(LOCALE_COOKIE)?.value !== first) {
+    if (
+      isDocumentNavigation(request) &&
+      request.cookies.get(LOCALE_COOKIE)?.value !== first
+    ) {
       response.cookies.set(LOCALE_COOKIE, first, {
         path: "/",
-        maxAge: ONE_YEAR,
+        maxAge: LOCALE_COOKIE_MAX_AGE,
         sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
       });
     }
     return response;
