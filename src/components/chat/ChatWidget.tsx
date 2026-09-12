@@ -391,7 +391,7 @@ function Bubble({ role, error, children }: { role: "user" | "assistant"; error?:
   return (
     <div className={`flex ${mine ? "justify-end" : "justify-start"}`}>
       <div
-        className={`max-w-[88%] rounded-2xl border-2 border-ink px-3 py-2 leading-relaxed ${
+        className={`min-w-0 max-w-[88%] break-words [overflow-wrap:anywhere] rounded-2xl border-2 border-ink px-3 py-2 leading-relaxed ${
           mine ? "rounded-br-md bg-ink text-white" : error ? "rounded-bl-md bg-tint-pink" : "rounded-bl-md bg-bg-elev"
         }`}
       >

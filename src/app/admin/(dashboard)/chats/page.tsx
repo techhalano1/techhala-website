@@ -70,7 +70,7 @@ export default async function AdminChatsPage() {
                   {ordered.map((m) => (
                     <li key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                       <div
-                        className={`max-w-[80%] whitespace-pre-line rounded-2xl border-2 border-ink px-3 py-2 ${
+                        className={`min-w-0 max-w-[80%] whitespace-pre-line break-words [overflow-wrap:anywhere] rounded-2xl border-2 border-ink px-3 py-2 ${
                           m.role === "user" ? "bg-ink text-white" : "bg-bg-elev"
                         }`}
                       >
