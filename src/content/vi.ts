@@ -749,7 +749,7 @@ export const vi: Dictionary = {
     payments: [
       { id: "cod", name: "Thanh toán khi nhận hàng (COD)", body: "Kiểm tra hàng rồi mới thanh toán cho nhân viên giao hàng.", available: true },
       { id: "bank", name: "Chuyển khoản ngân hàng (VietQR)", body: "Quét mã QR bằng app ngân hàng ngay sau khi đặt — số tiền và nội dung điền sẵn, xác nhận thanh toán tự động.", available: true },
-      { id: "online", name: "Thanh toán online (MoMo, VNPay, thẻ)", body: "Sắp ra mắt.", available: false },
+      { id: "online", name: "Thẻ ATM / Visa / Master, MoMo, VNPay — sắp có", body: "Đang kết nối cổng thanh toán. Hiện bạn có thể thanh toán bằng chuyển khoản VietQR (xác nhận tự động) hoặc COD.", available: false },
     ],
     success: {
       title: "Đã nhận đơn hàng!",
@@ -808,11 +808,13 @@ export const vi: Dictionary = {
         amount: "Số tiền",
         copy: "Sao chép",
         copied: "Đã sao chép",
-        auto: "Thanh toán được xác nhận tự động khi tiền vào tài khoản. Tải lại trang này để xem trạng thái mới.",
+        auto: "Thanh toán được xác nhận tự động khi tiền vào tài khoản (thường trong 1 – 2 phút) — trang này sẽ tự cập nhật, bạn không cần tải lại.",
         report: "Tôi đã chuyển khoản",
         reporting: "Đang gửi…",
         reported: "Đã ghi nhận — chúng tôi sẽ kiểm tra và cập nhật trong ít phút.",
         paid: "Đã nhận thanh toán. Cảm ơn bạn!",
+        paidNext: "Chúng tôi sẽ đóng gói và giao hàng trong 2 – 4 ngày làm việc. Email xác nhận đã được gửi nếu bạn có nhập email.",
+        waiting: "Đang chờ tiền về…",
       },
     },
     statuses: {

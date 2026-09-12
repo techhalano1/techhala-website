@@ -1,6 +1,7 @@
 import { randomInt } from "node:crypto";
 import type { Product } from "@/content/types";
 import { getCatalogAll } from "@/lib/catalog";
+import { emailPaymentReceived } from "@/lib/email";
 import {
   requireDb,
   type Db,
@@ -313,7 +314,7 @@ export async function markOrderPaid(orderId: string, opts: { provider: string; a
     .update({ payment_status: "paid", updated_at: new Date().toISOString() })
     .eq("id", orderId)
     .eq("payment_status", "unpaid")
-    .select("id");
+    .select();
   if (error) throw error;
   if (!flipped || flipped.length === 0) return false;
   const { error: pErr } = await db.from("payments").insert({
@@ -324,6 +325,7 @@ export async function markOrderPaid(orderId: string, opts: { provider: string; a
     provider_ref: opts.ref || null,
   });
   if (pErr) throw pErr;
+  await emailPaymentReceived(flipped[0], opts.amount).catch((err) => console.error("[email]", err));
   return true;
 }
 
