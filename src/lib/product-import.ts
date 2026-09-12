@@ -1,5 +1,5 @@
 import ExcelJS from "exceljs";
-import { zipSync, strToU8 } from "fflate";
+import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import type { ProductColor } from "@/content/types";
 import { ageGroups, productCategories } from "@/content/types";
 import { isAgeGroup, isCategory } from "@/lib/catalog";
@@ -67,17 +67,73 @@ export type SheetValues = Record<string, { vi: string; en: string }>;
 
 // --- Reading ---------------------------------------------------------------------------------
 
-function cellText(v: ExcelJS.CellValue): string {
-  if (v === null || v === undefined) return "";
-  if (typeof v === "string" || typeof v === "number" || typeof v === "boolean") return String(v);
-  if (v instanceof Date) return v.toISOString();
-  if (typeof v === "object") {
-    if ("richText" in v) return v.richText.map((r) => r.text).join("");
-    if ("text" in v) return typeof v.text === "string" ? v.text : cellText(v.text);
-    if ("result" in v) return cellText(v.result);
-    if ("error" in v) return "";
+/** Minimal OOXML reader: tolerates namespace-prefixed XML (e.g. `<x:workbook>`) and absolute rel targets that ExcelJS rejects. */
+function stripNs(xml: string) {
+  return xml.replace(/<(\/?)[A-Za-z0-9_]+:/g, "<$1").replace(/\s[A-Za-z0-9_]+:([A-Za-z0-9_]+=)/g, " $1");
+}
+
+function xmlText(s: string) {
+  return s
+    .replace(/<[^>]+>/g, "")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)))
+    .replace(/&amp;/g, "&");
+}
+
+function colIndex(ref: string) {
+  let n = 0;
+  for (const ch of ref.replace(/\d+$/, "")) n = n * 26 + (ch.toUpperCase().charCodeAt(0) - 64);
+  return n;
+}
+
+function readXlsxRows(buf: Uint8Array): string[][] {
+  const files = unzipSync(buf);
+  const get = (path: string) => {
+    const key = Object.keys(files).find((k) => k.replace(/^\/+/, "") === path.replace(/^\/+/, ""));
+    return key ? stripNs(strFromU8(files[key])) : null;
+  };
+  const wb = get("xl/workbook.xml");
+  const rels = get("xl/_rels/workbook.xml.rels");
+  if (!wb || !rels) throw new Error("File Excel không hợp lệ.");
+  const firstSheet = /<sheet\b[^>]*\bid="([^"]+)"/.exec(wb)?.[1];
+  if (!firstSheet) throw new Error("File Excel không có sheet nào.");
+  const relRe = new RegExp(`<Relationship\\b[^>]*\\bId="${firstSheet}"[^>]*>`);
+  const target = /Target="([^"]+)"/.exec(relRe.exec(rels)?.[0] ?? "")?.[1];
+  if (!target) throw new Error("File Excel không hợp lệ.");
+  const sheet = get(target.startsWith("/") ? target : `xl/${target}`);
+  if (!sheet) throw new Error("File Excel không hợp lệ.");
+
+  const shared: string[] = [];
+  const ss = get("xl/sharedStrings.xml");
+  if (ss) for (const m of ss.matchAll(/<si>([\s\S]*?)<\/si>/g)) shared.push(xmlText(m[1].match(/<t\b[^>]*>[\s\S]*?<\/t>|<t\b[^>]*\/>/g)?.join("") ?? ""));
+
+  const rows: string[][] = [];
+  for (const rm of sheet.matchAll(/<row\b[^>]*>([\s\S]*?)<\/row>/g)) {
+    const cells: string[] = [];
+    for (const cm of rm[1].matchAll(/<c\b([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g)) {
+      const attrs = cm[1];
+      const inner = cm[2] ?? "";
+      const ref = /\br="([A-Z]+)\d+"/i.exec(attrs)?.[1];
+      const type = /\bt="([^"]+)"/.exec(attrs)?.[1] ?? "n";
+      let text = "";
+      if (type === "s") text = shared[Number(xmlText(/<v>([\s\S]*?)<\/v>/.exec(inner)?.[1] ?? ""))] ?? "";
+      else if (type === "inlineStr") text = xmlText(inner.match(/<t\b[^>]*>[\s\S]*?<\/t>/g)?.join("") ?? "");
+      else if (type === "b") text = /<v>1<\/v>/.test(inner) ? "yes" : "no";
+      else text = xmlText(/<v>([\s\S]*?)<\/v>/.exec(inner)?.[1] ?? "");
+      const idx = ref ? colIndex(ref) - 1 : cells.length;
+      while (cells.length < idx) cells.push("");
+      cells[idx] = text.trim();
+    }
+    if (cells.some(Boolean)) {
+      while (cells.length < 3) cells.push("");
+      rows.push(cells);
+    }
   }
-  return "";
+  return rows;
 }
 
 function parseCsv(text: string): string[][] {
@@ -116,17 +172,11 @@ function parseCsv(text: string): string[][] {
 
 async function readRows(buf: Uint8Array, filename: string): Promise<string[][]> {
   if (/\.csv$/i.test(filename)) return parseCsv(new TextDecoder("utf-8").decode(buf));
-  const wb = new ExcelJS.Workbook();
-  await wb.xlsx.load(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer);
-  const ws = wb.worksheets[0];
-  if (!ws) throw new Error("File Excel không có sheet nào.");
-  const rows: string[][] = [];
-  ws.eachRow({ includeEmpty: false }, (r) => {
-    const cells: string[] = [];
-    for (let c = 1; c <= Math.max(3, r.cellCount); c++) cells.push(cellText(r.getCell(c).value).trim());
-    rows.push(cells);
-  });
-  return rows;
+  try {
+    return readXlsxRows(buf);
+  } catch (err) {
+    throw new Error(`Không đọc được file Excel: ${err instanceof Error ? err.message : "lỗi"}`);
+  }
 }
 
 /** Vertical sheet → values keyed by field. Unknown field names are reported, not silently dropped. */
