@@ -95,7 +95,7 @@ export function ProductGallery({ product: p, shellHex, activeId, onActiveChange,
   return (
     <div className="lg:flex lg:gap-4">
       {images.length > 1 && (
-        <ul className="hidden w-[72px] shrink-0 flex-col gap-2 self-start lg:sticky lg:top-24 lg:flex" aria-label={labels.gallery}>
+        <ul className="hidden w-[64px] shrink-0 flex-col gap-2 self-start lg:sticky lg:top-24 lg:flex" aria-label={labels.gallery}>
           {images.map((img, k) => (
             <li key={img.id}>
               <button
@@ -110,7 +110,7 @@ export function ProductGallery({ product: p, shellHex, activeId, onActiveChange,
                   img.id === activeId ? "border-accent shadow-hard-accent" : "border-ink opacity-75 hover:opacity-100"
                 }`}
               >
-                <Image src={img.url} alt="" fill sizes="72px" className="object-cover" />
+                <Image src={img.url} alt="" fill sizes="64px" className="object-cover" />
               </button>
             </li>
           ))}
@@ -138,7 +138,7 @@ export function ProductGallery({ product: p, shellHex, activeId, onActiveChange,
                     alt={it.image.alt || p.name}
                     fill
                     priority={k === 0}
-                    sizes="(min-width: 1024px) 50vw, 88vw"
+                    sizes="(min-width: 1024px) 500px, 88vw"
                     className="object-contain"
                   />
                 </div>

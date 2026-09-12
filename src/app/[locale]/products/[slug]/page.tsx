@@ -74,12 +74,12 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
           {L.allProducts}
         </Link>
         <ProductBuyBox product={p} locale={locale} t={t} availability={availability}>
-          <div className="mt-12 space-y-12">
+          <div className="space-y-10">
             <section>
-              <Heading as="h2" className="text-2xl font-extrabold sm:text-3xl">
+              <Heading as="h2" className="text-lg font-extrabold sm:text-xl">
                 {L.highlights}
               </Heading>
-              <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+              <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {p.highlights.map((h) => (
                   <li key={h} className="flex gap-3 rounded-xl border-2 border-ink bg-bg-elev p-4 text-sm font-semibold">
                     <Check />
@@ -90,16 +90,16 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
             </section>
 
             <section>
-              <Heading as="h2" className="text-2xl font-extrabold sm:text-3xl">
+              <Heading as="h2" className="text-lg font-extrabold sm:text-xl">
                 {L.features}
               </Heading>
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {p.features.map((f, i) => (
-                  <div key={f.title} className="kcard p-5">
+                  <div key={f.title} className="kcard p-4">
                     <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg border-2 border-ink bg-tint-yellow font-mono text-sm font-bold">
                       {i + 1}
                     </span>
-                    <h3 className="mt-3 font-extrabold">{f.title}</h3>
+                    <h3 className="mt-3 text-sm font-extrabold">{f.title}</h3>
                     <p className="mt-2 text-sm text-muted">{f.body}</p>
                   </div>
                 ))}
@@ -107,12 +107,12 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
             </section>
 
             <section>
-              <Heading as="h2" className="text-2xl font-extrabold sm:text-3xl">
+              <Heading as="h2" className="text-lg font-extrabold sm:text-xl">
                 {L.specs}
               </Heading>
-              <dl className="kcard mt-5 divide-y-2 divide-border overflow-hidden">
+              <dl className="kcard mt-4 divide-y-2 divide-border overflow-hidden">
                 {p.specs.map((s) => (
-                  <div key={s.label} className="grid grid-cols-[1fr_2fr] gap-4 px-5 py-3 text-sm">
+                  <div key={s.label} className="grid grid-cols-[1fr_2fr] gap-4 px-4 py-2.5 text-sm sm:grid-cols-[200px_1fr]">
                     <dt className="text-muted">{s.label}</dt>
                     <dd className="font-semibold">{s.value}</dd>
                   </div>
@@ -121,10 +121,10 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
             </section>
 
             <section>
-              <Heading as="h2" className="text-2xl font-extrabold sm:text-3xl">
+              <Heading as="h2" className="text-lg font-extrabold sm:text-xl">
                 {L.inBox}
               </Heading>
-              <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+              <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {p.inBox.map((i) => (
                   <li key={i} className="flex gap-3 text-sm font-semibold">
                     <Check />
@@ -132,7 +132,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                   </li>
                 ))}
               </ul>
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 {t.shop.guarantees.map((g) => (
                   <div key={g.title} className="rounded-xl border-2 border-ink bg-bg-elev p-4">
                     <p className="text-sm font-bold">{g.title}</p>
