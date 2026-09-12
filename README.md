@@ -87,6 +87,7 @@ A floating "Chat tư vấn" widget talks to OpenAI through `src/app/api/chat/rou
 - [ ] `BANK_CODE`, `BANK_ACCOUNT_NO`, `BANK_ACCOUNT_NAME` — scan the QR once with a real banking app and check amount/content
 - [ ] SePay webhook added with the API key in `SEPAY_API_KEY`; send a small real transfer with an order code and confirm the order flips to paid
 - [ ] `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` so you hear about orders/payments
+- [ ] `RESEND_API_KEY` + `EMAIL_FROM` (verified domain) so customers get order-confirmation and payment-received emails
 - [ ] `OPENAI_API_KEY` for the sales chatbot (set a spend limit on the OpenAI project)
 - [ ] `NEXT_PUBLIC_SITE_URL` set to the public domain (used in tracking links sent to customers)
 - [ ] Replace sample ratings / sold counts / testimonials in `src/content/*.ts` with real figures

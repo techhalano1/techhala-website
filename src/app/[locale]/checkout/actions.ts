@@ -6,6 +6,7 @@ import { getDb, isPaymentMethod } from "@/lib/db";
 import { isLocale } from "@/lib/i18n";
 import { createOrder, makeOrderCode, OutOfStockError, recentOrderCount, type NewOrder, type OrderLine } from "@/lib/orders";
 import { notifyNewOrder } from "@/lib/notify";
+import { emailOrderConfirmation } from "@/lib/email";
 import { transferInfoFor } from "@/lib/payments";
 import type { BankTransferInfo } from "@/components/BankTransferPanel";
 
@@ -14,7 +15,7 @@ export type CustomerFields = { name: string; phone: string; email: string; addre
 export type OrderState =
   | { status: "idle" }
   | { status: "error"; reason?: "out_of_stock" | "too_many"; items?: string; customer?: CustomerFields; payment?: string }
-  | { status: "success"; orderCode: string; trackUrl?: string; bank?: BankTransferInfo };
+  | { status: "success"; orderCode: string; token?: string; trackUrl?: string; bank?: BankTransferInfo };
 
 const MAX_LINES = 20;
 const MAX_QTY = 10;
@@ -99,11 +100,18 @@ export async function submitOrder(_prev: OrderState, formData: FormData): Promis
       return fail({ reason: "too_many" });
     }
     const saved = await createOrder(order);
-    await notifyNewOrder(order, saved.code, saved.id);
+    await Promise.all([
+      notifyNewOrder(order, saved.code, saved.id),
+      emailOrderConfirmation(
+        saved,
+        lines.map((l) => ({ product_name: l.name, color: l.color ?? null, quantity: l.quantity, line_total: l.lineTotal })),
+      ).catch((err) => console.error("[email]", err)),
+    ]);
     const bank = payment === "bank" ? await transferInfoFor(saved.code, saved.total) : null;
     return {
       status: "success",
       orderCode: saved.code,
+      token: saved.access_token,
       trackUrl: `/${locale}/orders/${saved.code}?t=${saved.access_token}`,
       bank: bank ?? undefined,
     };

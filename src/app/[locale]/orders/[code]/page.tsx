@@ -9,8 +9,8 @@ import { getDb, type OrderStatus } from "@/lib/db";
 import { getOrderByToken, normalizeOrderCode } from "@/lib/orders";
 import { transferInfoFor } from "@/lib/payments";
 import { Heading, Section } from "@/components/ui";
-import { BankTransferPanel } from "@/components/BankTransferPanel";
 import { ReportTransferButton } from "@/components/ReportTransferButton";
+import { TransferStatus } from "@/components/TransferStatus";
 
 export const dynamic = "force-dynamic";
 
@@ -105,14 +105,14 @@ export default async function OrderDetailPage({
             </div>
 
             {bank && (
-              <BankTransferPanel info={bank} locale={locale} labels={D}>
-                <ReportTransferButton
-                  code={order.code}
-                  token={token}
-                  alreadyReported={order.transfer_reported_at !== null}
-                  labels={D.bank}
-                />
-              </BankTransferPanel>
+              <TransferStatus
+                info={bank}
+                code={order.code}
+                token={token}
+                locale={locale}
+                labels={D}
+                alreadyReported={order.transfer_reported_at !== null}
+              />
             )}
 
             <div className="kcard p-6">

@@ -747,8 +747,8 @@ export const en: Dictionary = {
       sending: "Sending…",
     },
     payments: [
-      { id: "cod", name: "Cash on delivery (COD)", body: "Inspect the product, then pay the courier.", available: true },
       { id: "bank", name: "Bank transfer (VietQR)", body: "Scan a QR code with any Vietnamese banking app right after ordering — amount and note pre-filled, payment confirmed automatically.", available: true },
+      { id: "cod", name: "Cash on delivery (COD)", body: "Inspect the product, then pay the courier.", available: true },
       { id: "online", name: "Online payment (MoMo, VNPay, card)", body: "Coming soon.", available: false },
     ],
     success: {
@@ -808,11 +808,13 @@ export const en: Dictionary = {
         amount: "Amount",
         copy: "Copy",
         copied: "Copied",
-        auto: "Payment is confirmed automatically when the transfer arrives. Reload this page to see the latest status.",
+        auto: "Payment is confirmed automatically when the transfer arrives (usually within 1 – 2 minutes) — this page updates by itself, no reload needed.",
         report: "I have transferred",
         reporting: "Sending…",
         reported: "Noted — we'll verify and update within a few minutes.",
         paid: "Payment received. Thank you!",
+        paidNext: "We will pack and deliver within 2 – 4 business days. A confirmation email was sent if you entered one.",
+        waiting: "Waiting for the transfer…",
       },
     },
     statuses: {

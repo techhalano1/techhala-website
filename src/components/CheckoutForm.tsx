@@ -11,7 +11,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { useCart } from "@/components/cart/CartProvider";
 import { QtyStepper, resolveLines } from "@/components/cart/CartDrawer";
 import { submitOrder, type OrderState } from "@/app/[locale]/checkout/actions";
-import { BankTransferPanel } from "@/components/BankTransferPanel";
+import { TransferStatus } from "@/components/TransferStatus";
 
 const field =
   "w-full rounded-xl border-2 border-ink bg-bg-elev px-3.5 py-2.5 text-sm outline-none transition placeholder:text-muted/70 focus:shadow-hard-accent";
@@ -71,7 +71,7 @@ export function CheckoutForm({
         </ol>
         {state.bank && (
           <div className="mt-6">
-            <BankTransferPanel info={state.bank} locale={locale} labels={t.orders.detail} />
+            <TransferStatus info={state.bank} code={state.orderCode} token={state.token} locale={locale} labels={t.orders.detail} />
           </div>
         )}
         <div className="mt-8 flex flex-wrap justify-center gap-3">

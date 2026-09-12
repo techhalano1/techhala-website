@@ -293,6 +293,8 @@ export type Dictionary = {
         reporting: string;
         reported: string;
         paid: string;
+        paidNext: string;
+        waiting: string;
       };
     };
     statuses: Record<"pending" | "confirmed" | "packed" | "shipping" | "delivered" | "cancelled" | "returned", string>;

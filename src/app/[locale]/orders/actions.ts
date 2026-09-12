@@ -22,6 +22,19 @@ export async function reportTransferAction(code: string, token: string): Promise
   }
 }
 
+/** Polled by the checkout/tracking page while a bank transfer is awaited. */
+export async function paymentStatusAction(code: string, token: string): Promise<"paid" | "unpaid" | "unknown"> {
+  if (!code || !token || !getDb()) return "unknown";
+  try {
+    const order = await getOrderByToken(code, token);
+    if (!order) return "unknown";
+    return order.payment_status === "paid" ? "paid" : "unpaid";
+  } catch (err) {
+    console.error("[orders] paymentStatus failed", err);
+    return "unknown";
+  }
+}
+
 export type LookupState = { status: "idle" } | { status: "not_found" };
 
 export async function lookupOrder(_prev: LookupState, formData: FormData): Promise<LookupState> {
