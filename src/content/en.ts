@@ -747,8 +747,8 @@ export const en: Dictionary = {
       sending: "Sending…",
     },
     payments: [
-      { id: "cod", name: "Cash on delivery (COD)", body: "Inspect the product, then pay the courier.", available: true },
       { id: "bank", name: "Bank transfer (VietQR)", body: "Scan a QR code with any Vietnamese banking app right after ordering — amount and note pre-filled, payment confirmed automatically.", available: true },
+      { id: "cod", name: "Cash on delivery (COD)", body: "Inspect the product, then pay the courier.", available: true },
       { id: "online", name: "Online payment (MoMo, VNPay, card)", body: "Coming soon.", available: false },
     ],
     success: {

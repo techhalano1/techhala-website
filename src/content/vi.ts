@@ -747,8 +747,8 @@ export const vi: Dictionary = {
       sending: "Đang gửi…",
     },
     payments: [
-      { id: "cod", name: "Thanh toán khi nhận hàng (COD)", body: "Kiểm tra hàng rồi mới thanh toán cho nhân viên giao hàng.", available: true },
       { id: "bank", name: "Chuyển khoản ngân hàng (VietQR)", body: "Quét mã QR bằng app ngân hàng ngay sau khi đặt — số tiền và nội dung điền sẵn, xác nhận thanh toán tự động.", available: true },
+      { id: "cod", name: "Thanh toán khi nhận hàng (COD)", body: "Kiểm tra hàng rồi mới thanh toán cho nhân viên giao hàng.", available: true },
       { id: "online", name: "Thẻ ATM / Visa / Master, MoMo, VNPay — sắp có", body: "Đang kết nối cổng thanh toán. Hiện bạn có thể thanh toán bằng chuyển khoản VietQR (xác nhận tự động) hoặc COD.", available: false },
     ],
     success: {
