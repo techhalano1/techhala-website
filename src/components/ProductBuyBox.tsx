@@ -187,6 +187,13 @@ export function ProductBuyBox({ product: p, locale, t, availability = null, chil
                 <QtyStepper qty={qty} onChange={(q) => setQty(Math.min(Math.max(1, q), available ?? Number.MAX_SAFE_INTEGER))} label={t.shop.cart.quantity} />
               </div>
 
+              <div className="mt-3 flex items-baseline justify-between gap-3 border-t-2 border-dashed border-border pt-3">
+                <span className="text-sm font-bold">
+                  {t.shop.cart.subtotal} <span className="font-semibold text-muted">(×{qty})</span>
+                </span>
+                <Price amount={p.price * qty} locale={locale} className="text-xl" />
+              </div>
+
               {soldOut && <p className="mt-4 rounded-lg bg-tint-pink px-3 py-2 text-sm font-semibold">{L.outOfStockHint}</p>}
 
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -251,8 +258,11 @@ export function ProductBuyBox({ product: p, locale, t, availability = null, chil
       <div className="fixed inset-x-0 bottom-0 z-30 border-t-2 border-ink bg-bg/95 backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
           <div className="min-w-0">
-            <p className="truncate text-sm font-bold">{p.name}</p>
-            <Price amount={p.price} locale={locale} />
+            <p className="truncate text-sm font-bold">
+              {p.name}
+              {qty > 1 && <span className="font-semibold text-muted"> ×{qty}</span>}
+            </p>
+            <Price amount={p.price * qty} locale={locale} />
           </div>
           <div className="flex shrink-0 gap-2">
             <AddToCartButton
