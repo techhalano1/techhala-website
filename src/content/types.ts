@@ -178,6 +178,24 @@ export type Dictionary = {
       quantity: string;
     };
     guarantees: { title: string; body: string }[];
+    chat: {
+      open: string;
+      close: string;
+      title: string;
+      subtitle: string;
+      greeting: string;
+      placeholder: string;
+      send: string;
+      thinking: string;
+      suggestions: string[];
+      error: string;
+      unavailable: string;
+      rateLimited: string;
+      reset: string;
+      disclaimer: string;
+      viewProduct: string;
+      checkout: string;
+    };
   };
   home: {
     hero: {

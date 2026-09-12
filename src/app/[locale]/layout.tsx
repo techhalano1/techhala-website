@@ -11,6 +11,7 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { CartDrawer } from "@/components/cart/CartDrawer";
+import { ChatWidget } from "@/components/chat/ChatWidget";
 import "../globals.css";
 
 const inter = Inter({ subsets: ["latin", "vietnamese"], variable: "--font-sans" });
@@ -98,6 +99,7 @@ export default async function LocaleLayout({
           <main className="flex-1">{children}</main>
           <Footer locale={locale} t={t} />
           <CartDrawer locale={locale} t={t} />
+          <ChatWidget locale={locale} t={t} />
         </CartProvider>
         <Analytics />
       </body>

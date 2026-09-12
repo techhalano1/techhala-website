@@ -238,6 +238,18 @@ insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_typ
 values ('products', 'products', true, 104857600, array['image/jpeg','image/png','image/webp','image/gif','image/avif','video/mp4','video/webm','video/quicktime'])
 on conflict (id) do update set public = true, file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
 
+-- Storefront chatbot transcripts (one row per message) for the owner to review in /admin/chats.
+create table if not exists chat_messages (
+  id            bigserial primary key,
+  session_id    text not null,
+  locale        text not null default 'vi',
+  role          text not null check (role in ('user','assistant')),
+  content       text not null,
+  created_at    timestamptz not null default now()
+);
+create index if not exists chat_messages_session_idx on chat_messages(session_id, id);
+create index if not exists chat_messages_created_idx on chat_messages(created_at desc);
+
 -- Lock everything down: the site talks to the DB with the service role only.
 alter table products enable row level security;
 alter table product_translations enable row level security;
@@ -249,3 +261,4 @@ alter table order_events enable row level security;
 alter table payments enable row level security;
 alter table bank_transactions enable row level security;
 alter table inventory_movements enable row level security;
+alter table chat_messages enable row level security;
