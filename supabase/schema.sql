@@ -245,8 +245,11 @@ create table if not exists chat_messages (
   locale        text not null default 'vi',
   role          text not null check (role in ('user','assistant')),
   content       text not null,
+  -- 'ai' = answered by the model; 'faq:<rule>' = canned answer (no tokens spent).
+  source        text not null default 'ai',
   created_at    timestamptz not null default now()
 );
+alter table chat_messages add column if not exists source text not null default 'ai';
 create index if not exists chat_messages_session_idx on chat_messages(session_id, id);
 create index if not exists chat_messages_created_idx on chat_messages(created_at desc);
 

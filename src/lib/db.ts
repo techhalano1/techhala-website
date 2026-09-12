@@ -189,6 +189,8 @@ export type ChatMessageRow = {
   locale: string;
   role: "user" | "assistant";
   content: string;
+  /** "ai" or "faq:<rule>" (canned answer). */
+  source: string;
   created_at: string;
 };
 

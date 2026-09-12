@@ -17,12 +17,23 @@ export function chatConfigured() {
   return Boolean(process.env.OPENAI_API_KEY);
 }
 
+/**
+ * Public origin for links in answers. Uses the host the visitor is actually on (so a custom
+ * domain attached to the Vercel project works without env changes) and falls back to siteUrl.
+ */
+export function requestOrigin(headers: Headers) {
+  const host = headers.get("x-forwarded-host")?.split(",")[0]?.trim() || headers.get("host")?.trim();
+  if (!host || !/^[a-z0-9.-]+(:\d+)?$/i.test(host)) return siteUrl;
+  const proto = headers.get("x-forwarded-proto")?.split(",")[0]?.trim() || (/^(localhost|127\.0\.0\.1)(:\d+)?$/.test(host) ? "http" : "https");
+  return `${proto}://${host}`;
+}
+
 /** `[[product:slug]]` markers the model emits; the widget renders them as product cards. */
 export const PRODUCT_TOKEN_RE = /\[\[product:([a-z0-9-]+)\]\]/g;
 
 const vnd = (n: number) => new Intl.NumberFormat("vi-VN").format(n) + " ₫";
 
-function describeProduct(p: Product, stock: Record<string, number> | undefined, enforced: boolean) {
+function describeProduct(p: Product, stock: Record<string, number> | undefined, enforced: boolean, link: string, detailed: boolean) {
   const colors = p.colors?.length
     ? p.colors
         .map((c) => {
@@ -51,10 +62,10 @@ function describeProduct(p: Product, stock: Record<string, number> | undefined, 
     `- Dành cho: ${p.audience}`,
     `- Tóm tắt: ${p.tagline}. ${p.summary}`,
     p.highlights.length ? `- Điểm nổi bật: ${p.highlights.join("; ")}` : "",
-    p.features.length ? `- Tính năng: ${p.features.map((f) => `${f.title} — ${f.body}`).join("; ")}` : "",
-    p.specs.length ? `- Thông số: ${p.specs.map((s) => `${s.label}: ${s.value}`).join("; ")}` : "",
-    p.inBox.length ? `- Trong hộp: ${p.inBox.join(", ")}` : "",
-    `- Link: ${siteUrl}/vi/products/${p.slug}`,
+    detailed && p.features.length ? `- Tính năng: ${p.features.map((f) => `${f.title} — ${f.body}`).join("; ")}` : "",
+    detailed && p.specs.length ? `- Thông số: ${p.specs.map((s) => `${s.label}: ${s.value}`).join("; ")}` : "",
+    detailed && p.inBox.length ? `- Trong hộp: ${p.inBox.join(", ")}` : "",
+    `- Link: ${link}`,
   ]
     .filter(Boolean)
     .join("\n");
@@ -73,17 +84,44 @@ async function stockBySlug() {
   }
 }
 
+/** Slugs with no sellable unit in any colour (only when stock is enforced). */
+export async function soldOutSlugs() {
+  const stock = await stockBySlug();
+  const out = new Set<string>();
+  for (const [slug, byColor] of Object.entries(stock)) {
+    if (Object.values(byColor).every((n) => n <= 0)) out.add(slug);
+  }
+  return out;
+}
+
+const DETAIL_RE = /thông số|thong so|spec|pin|battery|kích thước|kich thuoc|cân nặng|can nang|trong hộp|trong hop|in the box|tính năng|tinh nang|feature|kết nối|ket noi|connect|bluetooth|wifi|wi-fi|màn hình|man hinh|screen|loa|speaker|mic|camera|sạc|sac|charg/i;
+
+/** Full specs only for products the conversation mentions (or when the customer asks about specs); everything else is summarised to save tokens. */
+function detailedSlugs(products: Product[], messages: ChatMessage[]) {
+  const text = messages.map((m) => m.content).join("\n").toLowerCase();
+  const wantsDetail = DETAIL_RE.test(text);
+  const out = new Set<string>();
+  for (const p of products) {
+    if (text.includes(p.slug) || text.includes(p.name.toLowerCase()) || text.includes(`[[product:${p.slug}]]`)) out.add(p.slug);
+  }
+  if (wantsDetail && out.size === 0) for (const p of products) if (p.category === "education" || p.category === "home") out.add(p.slug);
+  return out;
+}
+
 /** System prompt: strict scope + the live catalog (always Vietnamese source data; the model answers in the visitor's language). */
-export async function buildSystemPrompt(locale: Locale) {
+export async function buildSystemPrompt(locale: Locale, messages: ChatMessage[] = [], origin: string = siteUrl) {
   const [products, stock] = await Promise.all([getCatalog("vi"), stockBySlug()]);
   const enforced = stockEnforced();
   const t = getDictionary("vi");
-  const catalog = products.map((p) => describeProduct(p, stock[p.slug], enforced)).join("\n\n");
+  const detailed = detailedSlugs(products, messages);
+  const catalog = products
+    .map((p) => describeProduct(p, stock[p.slug], enforced, `${origin}/${locale}/products/${p.slug}`, detailed.has(p.slug)))
+    .join("\n\n");
   const guarantees = t.shop.guarantees.map((g) => `- ${g.title}: ${g.body}`).join("\n");
   const faq = t.home.faq.items.map((f) => `- Q: ${f.q}\n  A: ${f.a}`).join("\n");
   const lang = locale === "vi" ? "tiếng Việt" : "English";
 
-  return `Bạn là "Hala", trợ lý tư vấn bán hàng của TechHala (${siteUrl}) — cửa hàng robot AI cho trẻ em học tiếng Anh và robot trợ lý gia đình tại Việt Nam.
+  return `Bạn là "Hala", trợ lý tư vấn bán hàng của TechHala (${origin}) — cửa hàng robot AI cho trẻ em học tiếng Anh và robot trợ lý gia đình tại Việt Nam.
 
 # Phạm vi (bắt buộc)
 - CHỈ tư vấn về các sản phẩm trong DANH MỤC bên dưới, chính sách mua hàng/giao hàng/bảo hành/thanh toán của TechHala, và cách liên hệ. Không nói về sản phẩm hay thương hiệu khác, không so sánh với đối thủ.
@@ -99,7 +137,7 @@ export async function buildSystemPrompt(locale: Locale) {
 
 # Thông tin cửa hàng
 - Địa chỉ: ${company.address}. Hotline: ${company.phoneDisplay}. Zalo: ${company.zaloUrl}. Email: ${company.email}.
-- Thanh toán: COD (trả khi nhận hàng) hoặc chuyển khoản ngân hàng với mã VietQR tự điền số tiền + mã đơn; sau khi đặt, khách tra cứu đơn tại ${siteUrl}/vi/orders bằng mã đơn + số điện thoại.
+- Thanh toán: COD (trả khi nhận hàng) hoặc chuyển khoản ngân hàng với mã VietQR tự điền số tiền + mã đơn; sau khi đặt, khách tra cứu đơn tại ${origin}/${locale}/orders bằng mã đơn + số điện thoại.
 ${guarantees}
 
 # Câu hỏi thường gặp
@@ -195,12 +233,13 @@ export function throttled(ip: string) {
 }
 
 // --- Conversation log (optional, for the owner to review in /admin/chats) -------------
-export async function logChat(sessionId: string, locale: Locale, userText: string, assistantText: string) {
+/** `source` is "ai" for model answers or "faq:<rule>" for canned ones (no tokens spent). */
+export async function logChat(sessionId: string, locale: Locale, userText: string, assistantText: string, source = "ai") {
   const db = getDb();
   if (!db) return;
   const { error } = await db.from("chat_messages").insert([
-    { session_id: sessionId, locale, role: "user", content: userText },
-    { session_id: sessionId, locale, role: "assistant", content: assistantText },
+    { session_id: sessionId, locale, role: "user", content: userText, source },
+    { session_id: sessionId, locale, role: "assistant", content: assistantText, source },
   ]);
   if (error) console.error("[chat] log failed", error.message);
 }

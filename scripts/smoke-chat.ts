@@ -15,14 +15,14 @@ function check(name: string, ok: boolean, detail = "") {
   if (!ok) failures++;
 }
 
-async function ask(messages: { role: "user" | "assistant"; content: string }[], locale = "vi") {
+async function ask(messages: { role: "user" | "assistant"; content: string }[], locale = "vi", headers: Record<string, string> = {}) {
   const res = await fetch(url, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "application/json", ...headers },
     body: JSON.stringify({ locale, sessionId, messages }),
   });
   const text = await res.text();
-  return { status: res.status, text };
+  return { status: res.status, text, source: res.headers.get("x-chat-source") ?? "" };
 }
 
 function markers(text: string) {
@@ -30,8 +30,21 @@ function markers(text: string) {
 }
 
 async function main() {
-  // 1. Product question
+  // 0. Canned answers (no OpenAI call)
   const first = vi.products.items[0];
+  const faq = await ask([{ role: "user", content: "Giá bao nhiêu?" }]);
+  check("faq price: served from FAQ", faq.status === 200 && faq.source === "faq:price", faq.source || String(faq.status));
+  check("faq price: live price + marker", faq.text.includes(new Intl.NumberFormat("vi-VN").format(first.price)) && markers(faq.text).includes(first.slug));
+  const faqEn = await ask([{ role: "user", content: "How do I order and pay?" }], "en");
+  check("faq en buy-pay: served from FAQ", faqEn.source === "faq:buy-pay" && /COD/.test(faqEn.text), faqEn.source);
+  const prod = await ask([{ role: "user", content: "tra cứu đơn hàng" }], "vi", { "x-forwarded-host": "techhala.com", "x-forwarded-proto": "https" });
+  check("faq tracking: links use request host", prod.text.includes("https://techhala.com/vi/orders") && !prod.text.includes("localhost"), prod.text.slice(0, 160));
+  const local = await ask([{ role: "user", content: "tra cứu đơn hàng" }]);
+  check("faq tracking: local dev keeps localhost", /https?:\/\/localhost:\d+\/vi\/orders/.test(local.text), local.text.slice(0, 160));
+  const nuanced = await ask([{ role: "user", content: "HalaBuddy và HalaBuddy Pro khác nhau chỗ nào?" }]);
+  check("nuanced question: goes to the model", nuanced.source === "ai", nuanced.source);
+
+  // 1. Product question
   const a = await ask([{ role: "user", content: `${first.name} giá bao nhiêu và dành cho độ tuổi nào?` }]);
   check("product question: 200", a.status === 200, String(a.status));
   const priceStr = new Intl.NumberFormat("vi-VN").format(first.price);
