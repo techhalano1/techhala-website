@@ -68,6 +68,18 @@ Two payment methods are offered: **COD** (recorded in admin when the courier rem
 
 Without `BANK_*` the customer sees a manual notice (quote the order code); without `SEPAY_API_KEY` nothing is auto-reconciled.
 
+### Sales assistant chatbot (`/api/chat`, widget on every storefront page)
+
+A floating "Chat tư vấn" widget talks to OpenAI through `src/app/api/chat/route.ts` (the key never reaches the browser). Each request rebuilds the system prompt from the **live** catalog (`getCatalog("vi")` — active products only, current prices/colours/ages/specs, per-colour stock when `STOCK_MODE` enforces it), the shop guarantees + FAQ from `src/content/vi.ts`, and the company contact/bank-transfer info from `src/lib/site.ts`. The prompt restricts the assistant to those products, ordering/payment/contact guidance, and a polite refusal for anything else; it cannot place orders or confirm payments.
+
+- **Canned answers first** (`src/lib/chat-faq.ts`): the last message is normalised (diacritics stripped) and matched against a small set of intents — greeting/thanks, age ("bé 7 tuổi…", "lớp 3"), grandparents, family, price (whole range or a named product), how to buy/pay, shipping, warranty, order tracking, contact, subscription fee, Wi-Fi, bulk/school. Hits are answered from the live catalog (prices, ages, sold-out products excluded when stock is enforced) and company data without calling OpenAI; the response carries `x-chat-source: faq:<rule>` and is logged with that `source`. Anything long, multi-question, comparative ("khác nhau", "nâng cấp", specs) or matching two intents falls through to the model (`source = ai`). `/admin/chats` shows the canned-vs-AI split. Offline check: `npx tsx scripts/test-chat-faq.ts`.
+- Absolute links in replies (`/vi/products/<slug>`, `/vi/orders`) use the request's host (`x-forwarded-host`), so they point at whatever domain the visitor is on (e.g. `https://techhala.com`); `NEXT_PUBLIC_SITE_URL` is only the fallback.
+- The model marks recommended products with `[[product:slug]]`; the widget turns those into cards (photo, price, *Add to cart*, *View*). Markers for slugs not in the catalog are dropped server- and client-side.
+- Replies stream as plain text; `[[error]]` appended to a reply means the upstream call failed mid-stream.
+- Guards: `OPENAI_API_KEY` unset → `503` (canned answers still work); >20 requests/min/IP (`CHAT_MAX_PER_MINUTE`) → `429`; body >16 KB → `413`; only the last 12 turns, 1 000 chars per user message.
+- Transcripts are stored in `chat_messages` (session id is a random id in the visitor's localStorage) and browsable at `/admin/chats`.
+- `OPENAI_MODEL` overrides the default `gpt-4.1-mini`.
+
 ### Production checklist
 
 - [ ] `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (schema applied, catalog synced, opening stock entered)
@@ -75,6 +87,7 @@ Without `BANK_*` the customer sees a manual notice (quote the order code); witho
 - [ ] `BANK_CODE`, `BANK_ACCOUNT_NO`, `BANK_ACCOUNT_NAME` — scan the QR once with a real banking app and check amount/content
 - [ ] SePay webhook added with the API key in `SEPAY_API_KEY`; send a small real transfer with an order code and confirm the order flips to paid
 - [ ] `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` so you hear about orders/payments
+- [ ] `OPENAI_API_KEY` for the sales chatbot (set a spend limit on the OpenAI project)
 - [ ] `NEXT_PUBLIC_SITE_URL` set to the public domain (used in tracking links sent to customers)
 - [ ] Replace sample ratings / sold counts / testimonials in `src/content/*.ts` with real figures
 
@@ -91,3 +104,5 @@ Order webhook payload: `{ type: "order", orderCode, orderId, lines: [{ slug, nam
 `npx tsx --env-file=.env.local scripts/smoke-products.ts` creates a throw-away product with two colours, uploads a PNG through a signed URL, attaches a YouTube link, checks the merged storefront catalog (translations, images per colour, hide/show, sort, edits surviving `syncCatalog`), then deletes the product and its Storage objects.
 
 `npx tsx --env-file=.env.local scripts/smoke-payments.ts` creates a bank-transfer order, then drives the SePay reconciliation path (outgoing / unknown code / underpaid / exact / duplicate) and asserts payment status and idempotency, then cleans up. With the dev server running, `SMOKE_WEBHOOK_URL=http://localhost:3000/api/webhooks/sepay` additionally exercises the HTTP route (auth + payload validation).
+
+`npx tsx --env-file=.env.local scripts/smoke-chat.ts` (dev server running, real OpenAI key) sends a product question, a recommendation request, a payment question and an off-topic question to `/api/chat`, asserts grounding (only catalog slugs, no invented products, refusal for off-topic), then checks the malformed / oversized / rate-limit paths.

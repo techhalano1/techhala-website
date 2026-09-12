@@ -183,6 +183,17 @@ export type VariantStockRow = {
   sold: number;
 };
 
+export type ChatMessageRow = {
+  id: number;
+  session_id: string;
+  locale: string;
+  role: "user" | "assistant";
+  content: string;
+  /** "ai" or "faq:<rule>" (canned answer). */
+  source: string;
+  created_at: string;
+};
+
 type Table<Row, Insert = Partial<Row>, Update = Partial<Row>> = {
   Row: Row;
   Insert: Insert;
@@ -203,6 +214,7 @@ export type Database = {
       payments: Table<PaymentRow>;
       bank_transactions: Table<BankTransactionRow>;
       inventory_movements: Table<InventoryMovementRow>;
+      chat_messages: Table<ChatMessageRow>;
     };
     Views: {
       variant_stock: { Row: VariantStockRow; Relationships: [] };
