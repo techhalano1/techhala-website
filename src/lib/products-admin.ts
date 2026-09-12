@@ -141,7 +141,7 @@ function translationOf(p: Product): TranslationInput {
 
 /** Snapshot of the current (merged) product as an editable input — used to materialise code products in the DB. */
 export async function productInputFor(slug: string): Promise<ProductInput | null> {
-  const [vi, en] = await Promise.all([findProduct("vi", slug), findProduct("en", slug)]);
+  const [vi, en, row] = await Promise.all([findProduct("vi", slug), findProduct("en", slug), getProductRow(slug)]);
   if (!vi || !en) return null;
   return {
     slug,
@@ -157,7 +157,7 @@ export async function productInputFor(slug: string): Promise<ProductInput | null
     art: vi.art,
     tint: vi.tint,
     videoUrl: vi.video && vi.video.kind !== "file" ? vi.video.url : null,
-    sortOrder: 1000,
+    sortOrder: row?.sort_order ?? 1000,
     translations: { vi: translationOf(vi), en: translationOf(en) },
   };
 }

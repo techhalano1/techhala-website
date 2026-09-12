@@ -10,7 +10,9 @@ import {
   addMedia,
   createUploadTarget,
   deleteProduct,
+  listMedia,
   mediaKindFor,
+  productInputFor,
   removeMedia,
   reorderMedia,
   saveProduct,
@@ -19,6 +21,7 @@ import {
   type ProductInput,
   type TranslationInput,
 } from "@/lib/products-admin";
+import { clearMedia, colorFromFilename, importImageUrl, planImport, readSheet, type ImportChange } from "@/lib/product-import";
 import type { ActionResult } from "@/app/admin/actions";
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -214,6 +217,114 @@ export async function reorderMediaAction(slug: string, orderedIds: number[]): Pr
   }
   revalidateStore();
   return { ok: true };
+}
+
+// --- ZIP / spreadsheet import -------------------------------------------------------------------
+
+export type ImportPreview =
+  | {
+      ok: true;
+      slug: string;
+      create: boolean;
+      changes: ImportChange[];
+      errors: string[];
+      warnings: string[];
+      unknown: string[];
+      imageUrls: string[];
+      colors: ProductColor[];
+      mediaCount: number;
+    }
+  | { ok: false; error: string };
+
+const MAX_SHEET_BYTES = 2 * 1024 * 1024;
+
+async function sheetFrom(fd: FormData) {
+  const file = fd.get("sheet");
+  if (!(file instanceof File)) throw new Error("Thiếu file product.xlsx / product.csv.");
+  if (file.size > MAX_SHEET_BYTES) throw new Error("File bảng tính quá lớn (tối đa 2 MB).");
+  if (!/\.(xlsx|csv)$/i.test(file.name)) throw new Error("Bảng tính phải là .xlsx hoặc .csv.");
+  return { bytes: new Uint8Array(await file.arrayBuffer()), name: file.name };
+}
+
+async function planFrom(fd: FormData) {
+  const pageSlug = str(fd, "slug", 80) || null;
+  if (pageSlug && !SLUG_RE.test(pageSlug)) throw new Error("Slug không hợp lệ.");
+  const sheet = await sheetFrom(fd);
+  const { values, unknown } = await readSheet(sheet.bytes, sheet.name);
+  const slug = pageSlug ?? (values.slug?.vi.toLowerCase() || "");
+  const base = slug && SLUG_RE.test(slug) ? await productInputFor(slug) : null;
+  const plan = planImport(values, base, pageSlug);
+  return { plan, unknown, base };
+}
+
+/** Step 1: validate the sheet and show what would change — nothing is written. */
+export async function previewImportAction(fd: FormData): Promise<ImportPreview> {
+  await requireAdmin();
+  try {
+    const { plan, unknown } = await planFrom(fd);
+    const mediaCount = plan.create ? 0 : (await listMedia(plan.input.slug)).length;
+    return {
+      ok: true,
+      slug: plan.input.slug,
+      create: plan.create,
+      changes: plan.changes,
+      errors: plan.errors,
+      warnings: plan.warnings,
+      unknown,
+      imageUrls: plan.imageUrls,
+      colors: plan.input.colors,
+      mediaCount,
+    };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Không đọc được file." };
+  }
+}
+
+/**
+ * Step 2: write the product; optionally wipe the current gallery so the ZIP's photos replace it.
+ * Photos from the ZIP are then uploaded by the browser (requestUpload/confirmUpload) and remote
+ * `imageUrls` are fetched by `importImageUrlsAction`.
+ */
+export async function applyImportAction(fd: FormData): Promise<ActionResult & { slug?: string }> {
+  await requireAdmin();
+  try {
+    const { plan } = await planFrom(fd);
+    if (plan.errors.length) return { ok: false, error: plan.errors.join(" · ") };
+    await saveProduct(plan.input, { create: plan.create });
+    if (fd.get("replaceMedia") === "1") await clearMedia(plan.input.slug);
+    revalidateStore();
+    return { ok: true, slug: plan.input.slug };
+  } catch (err) {
+    return fail(err);
+  }
+}
+
+export async function clearMediaAction(slug: string): Promise<ActionResult> {
+  await requireAdmin();
+  if (!SLUG_RE.test(slug)) return { ok: false, error: "Slug không hợp lệ." };
+  try {
+    await clearMedia(slug);
+  } catch (err) {
+    return fail(err);
+  }
+  revalidateStore();
+  return { ok: true };
+}
+
+export async function importImageUrlsAction(slug: string, urls: string[]): Promise<{ ok: true; failed: string[] } | { ok: false; error: string }> {
+  await requireAdmin();
+  if (!SLUG_RE.test(slug)) return { ok: false, error: "Slug không hợp lệ." };
+  const failed: string[] = [];
+  const colors = (await productInputFor(slug))?.colors ?? [];
+  for (const url of urls.slice(0, 30)) {
+    try {
+      await importImageUrl(slug, url, colorFromFilename(new URL(url).pathname, colors));
+    } catch (err) {
+      failed.push(`${url}: ${err instanceof Error ? err.message : "lỗi"}`);
+    }
+  }
+  revalidateStore();
+  return { ok: true, failed };
 }
 
 export async function removeMediaAction(id: number): Promise<ActionResult> {
