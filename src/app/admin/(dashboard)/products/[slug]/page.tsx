@@ -5,6 +5,7 @@ import { getProductRow, listMedia } from "@/lib/products-admin";
 import { siteUrl } from "@/lib/site";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { MediaManager } from "@/components/admin/MediaManager";
+import { ZipImport } from "@/components/admin/ZipImport";
 
 export default async function AdminProductEditPage({
   params,
@@ -39,6 +40,17 @@ export default async function AdminProductEditPage({
       </div>
 
       {created && <div className="kcard bg-tint-green p-4 text-sm font-bold">Đã tạo sản phẩm. Tải ảnh và thêm video ở mục bên dưới.</div>}
+
+      <section className="kcard p-5">
+        <h2 className="font-bold">Nhập từ ZIP</h2>
+        <p className="mt-1 text-xs text-muted">
+          Cập nhật toàn bộ thông tin + ảnh của sản phẩm này bằng một file ZIP (tải mẫu đã điền sẵn → sửa trong Excel → nén lại → nhập). Kết quả
+          hiện ngay ở hai mục bên dưới và vẫn sửa tay được.
+        </p>
+        <div className="mt-4">
+          <ZipImport slug={slug} />
+        </div>
+      </section>
 
       <section className="kcard p-5">
         <h2 className="font-bold">Ảnh &amp; video</h2>
