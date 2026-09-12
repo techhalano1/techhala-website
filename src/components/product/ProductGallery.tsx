@@ -138,7 +138,7 @@ export function ProductGallery({ product: p, shellHex, activeId, onActiveChange,
                     alt={it.image.alt || p.name}
                     fill
                     priority={k === 0}
-                    sizes="(min-width: 1024px) 424px, 88vw"
+                    sizes="(min-width: 1024px) 500px, 88vw"
                     className="object-contain"
                   />
                 </div>

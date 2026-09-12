@@ -90,7 +90,7 @@ export function ProductBuyBox({ product: p, locale, t, availability = null, chil
 
   return (
     <>
-      <div className="grid gap-8 lg:grid-cols-[500px_minmax(0,1fr)] lg:gap-x-10 lg:gap-y-12">
+      <div className="grid gap-8 lg:grid-cols-2 lg:gap-x-10 lg:gap-y-12">
         <div className="min-w-0 lg:col-start-1 lg:row-start-1">
           <ProductGallery
             product={p}
