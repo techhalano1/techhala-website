@@ -136,6 +136,11 @@ export type Dictionary = {
       inBox: string;
       video: string;
       gallery: string;
+      zoom: string;
+      askHala: string;
+      askHalaPrompt: string;
+      prevImage: string;
+      nextImage: string;
       related: string;
       allProducts: string;
       priceNote: string;

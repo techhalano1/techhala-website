@@ -9,6 +9,7 @@ import { company, formatVnd } from "@/lib/site";
 import { ProductVisual } from "@/components/ProductVisual";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { useCart } from "@/components/cart/CartProvider";
+import { OPEN_HALA_EVENT, type OpenHalaDetail } from "@/components/chat/openHala";
 
 type Msg = { id: string; role: "user" | "assistant"; content: string; status?: "streaming" | "error" };
 
@@ -156,6 +157,16 @@ export function ChatWidget({ locale, t }: { locale: Locale; t: Dictionary }) {
   }, [msgs, open]);
 
   useEffect(() => {
+    const onOpen = (e: Event) => {
+      const { prompt } = (e as CustomEvent<OpenHalaDetail>).detail ?? {};
+      if (prompt) setInput(prompt.slice(0, MAX_CHARS));
+      setOpen(true);
+    };
+    window.addEventListener(OPEN_HALA_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_HALA_EVENT, onOpen);
+  }, []);
+
+  useEffect(() => {
     if (!open) return;
     inputRef.current?.focus();
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
@@ -271,7 +282,7 @@ export function ChatWidget({ locale, t }: { locale: Locale; t: Dictionary }) {
         aria-expanded={open}
         aria-controls="th-chat-panel"
         className={`fixed right-4 z-40 flex h-14 items-center gap-2 rounded-full border-2 border-ink bg-accent pl-4 pr-5 text-sm font-bold text-white shadow-hard transition hover:-translate-y-0.5 sm:right-5 ${
-          onProductPage ? "bottom-20 lg:bottom-5" : "bottom-5"
+          onProductPage ? "bottom-20 lg:bottom-5 lg:left-5 lg:right-auto" : "bottom-5"
         } ${open ? "hidden sm:flex" : ""}`}
       >
         <ChatIcon />
@@ -283,7 +294,9 @@ export function ChatWidget({ locale, t }: { locale: Locale; t: Dictionary }) {
           id="th-chat-panel"
           role="dialog"
           aria-label={c.title}
-          className="fixed inset-0 z-[55] flex flex-col overflow-hidden bg-bg-elev sm:inset-auto sm:bottom-24 sm:right-5 sm:h-[min(640px,calc(100vh-7rem))] sm:w-[400px] sm:rounded-2xl sm:border-2 sm:border-ink sm:shadow-hard"
+          className={`fixed inset-0 z-[55] flex flex-col overflow-hidden bg-bg-elev sm:inset-auto sm:bottom-24 sm:right-5 sm:h-[min(640px,calc(100vh-7rem))] sm:w-[400px] sm:rounded-2xl sm:border-2 sm:border-ink sm:shadow-hard ${
+            onProductPage ? "lg:left-5 lg:right-auto" : ""
+          }`}
         >
           <header className="flex items-center gap-3 border-b-2 border-ink bg-ink px-4 py-3 text-white">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent">

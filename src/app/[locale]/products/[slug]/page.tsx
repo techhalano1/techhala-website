@@ -9,7 +9,6 @@ import { getDb } from "@/lib/db";
 import { availabilityForProduct, stockEnforced } from "@/lib/orders";
 import { ProductBuyBox } from "@/components/ProductBuyBox";
 import { ProductCard } from "@/components/ProductCard";
-import { ProductVideo } from "@/components/ProductVideo";
 import { Arrow, Check, Heading, Section } from "@/components/ui";
 
 type Params = { locale: Locale; slug: string };
@@ -30,15 +29,6 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     openGraph: p.images?.[0] ? { images: [{ url: p.images[0].url }] } : undefined,
   };
 }
-
-const tintBg = {
-  pink: "bg-tint-pink",
-  yellow: "bg-tint-yellow",
-  blue: "bg-tint-blue",
-  green: "bg-tint-green",
-  purple: "bg-tint-purple",
-  peach: "bg-tint-peach",
-} as const;
 
 export default async function ProductPage({ params }: { params: Promise<Params> }) {
   const { locale, slug } = await params;
@@ -83,81 +73,76 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
           </span>
           {L.allProducts}
         </Link>
-        <ProductBuyBox product={p} locale={locale} t={t} availability={availability} />
+        <ProductBuyBox product={p} locale={locale} t={t} availability={availability}>
+          <div className="mt-12 space-y-12">
+            <section>
+              <Heading as="h2" className="text-2xl font-extrabold sm:text-3xl">
+                {L.highlights}
+              </Heading>
+              <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+                {p.highlights.map((h) => (
+                  <li key={h} className="flex gap-3 rounded-xl border-2 border-ink bg-bg-elev p-4 text-sm font-semibold">
+                    <Check />
+                    {h}
+                  </li>
+                ))}
+              </ul>
+            </section>
 
-        <ul className="mt-10 grid gap-3 sm:grid-cols-2">
-          {p.highlights.map((h) => (
-            <li key={h} className="flex gap-3 rounded-xl border-2 border-ink bg-bg-elev p-4 text-sm font-semibold">
-              <Check />
-              {h}
-            </li>
-          ))}
-        </ul>
+            <section>
+              <Heading as="h2" className="text-2xl font-extrabold sm:text-3xl">
+                {L.features}
+              </Heading>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                {p.features.map((f, i) => (
+                  <div key={f.title} className="kcard p-5">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg border-2 border-ink bg-tint-yellow font-mono text-sm font-bold">
+                      {i + 1}
+                    </span>
+                    <h3 className="mt-3 font-extrabold">{f.title}</h3>
+                    <p className="mt-2 text-sm text-muted">{f.body}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
 
-        {p.video && (
-          <div className="mt-12">
-            <Heading as="h3" className="font-extrabold">
-              {L.video}
-            </Heading>
-            <div className="kcard mt-6 overflow-hidden">
-              <ProductVideo video={p.video} title={p.name} />
-            </div>
+            <section>
+              <Heading as="h2" className="text-2xl font-extrabold sm:text-3xl">
+                {L.specs}
+              </Heading>
+              <dl className="kcard mt-5 divide-y-2 divide-border overflow-hidden">
+                {p.specs.map((s) => (
+                  <div key={s.label} className="grid grid-cols-[1fr_2fr] gap-4 px-5 py-3 text-sm">
+                    <dt className="text-muted">{s.label}</dt>
+                    <dd className="font-semibold">{s.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+
+            <section>
+              <Heading as="h2" className="text-2xl font-extrabold sm:text-3xl">
+                {L.inBox}
+              </Heading>
+              <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+                {p.inBox.map((i) => (
+                  <li key={i} className="flex gap-3 text-sm font-semibold">
+                    <Check />
+                    {i}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                {t.shop.guarantees.map((g) => (
+                  <div key={g.title} className="rounded-xl border-2 border-ink bg-bg-elev p-4">
+                    <p className="text-sm font-bold">{g.title}</p>
+                    <p className="mt-1 text-xs text-muted">{g.body}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
           </div>
-        )}
-      </Section>
-
-      <Section className={`border-y-2 border-ink ${tintBg[p.tint]}`}>
-        <Heading className="font-extrabold">{L.features}</Heading>
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {p.features.map((f, i) => (
-            <div key={f.title} className="kcard p-6">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg border-2 border-ink bg-tint-yellow font-mono text-sm font-bold">
-                {i + 1}
-              </span>
-              <h3 className="mt-4 font-extrabold">{f.title}</h3>
-              <p className="mt-2 text-sm text-muted">{f.body}</p>
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      <Section>
-        <div className="grid gap-10 lg:grid-cols-2">
-          <div>
-            <Heading as="h3" className="font-extrabold">
-              {L.specs}
-            </Heading>
-            <dl className="kcard mt-6 divide-y-2 divide-border overflow-hidden">
-              {p.specs.map((s) => (
-                <div key={s.label} className="grid grid-cols-[1fr_2fr] gap-4 px-5 py-3 text-sm">
-                  <dt className="text-muted">{s.label}</dt>
-                  <dd className="font-semibold">{s.value}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-          <div>
-            <Heading as="h3" className="font-extrabold">
-              {L.inBox}
-            </Heading>
-            <ul className="mt-6 space-y-3">
-              {p.inBox.map((i) => (
-                <li key={i} className="flex gap-3 text-sm font-semibold">
-                  <Check />
-                  {i}
-                </li>
-              ))}
-            </ul>
-            <div className="mt-8 grid gap-3 sm:grid-cols-2">
-              {t.shop.guarantees.map((g) => (
-                <div key={g.title} className="rounded-xl border-2 border-ink bg-bg-elev p-4">
-                  <p className="text-sm font-bold">{g.title}</p>
-                  <p className="mt-1 text-xs text-muted">{g.body}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        </ProductBuyBox>
       </Section>
 
       <Section className="kdots border-t-2 border-ink pb-28 lg:pb-28">

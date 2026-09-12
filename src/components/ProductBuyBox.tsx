@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { Dictionary, Product } from "@/content";
 import { localePath, type Locale } from "@/lib/i18n";
 import { company } from "@/lib/site";
-import { ProductArt } from "@/components/ProductArt";
+import { ProductGallery } from "@/components/product/ProductGallery";
+import { openHala } from "@/components/chat/openHala";
 import { ComparePrice, Price, Stars, discountPercent, formatSold } from "@/components/ProductCard";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { QtyStepper } from "@/components/cart/CartDrawer";
@@ -19,11 +19,14 @@ type Props = {
   t: Dictionary;
   /** Available units per colour id ("" for colourless products); null = stock unknown / not enforced. */
   availability?: Record<string, number> | null;
+  /** Detail sections rendered under the gallery (left column on desktop). */
+  children?: ReactNode;
 };
 
 const LOW_STOCK_AT = 5;
+const STICKY_TOP = 96;
 
-export function ProductBuyBox({ product: p, locale, t, availability = null }: Props) {
+export function ProductBuyBox({ product: p, locale, t, availability = null, children }: Props) {
   const L = t.shop.labels;
   const availableFor = (c: string | undefined) => (availability ? (availability[c ?? ""] ?? 0) : null);
   const firstInStock = p.colors?.find((c) => (availableFor(c.id) ?? 1) > 0)?.id ?? p.colors?.[0]?.id;
@@ -35,15 +38,11 @@ export function ProductBuyBox({ product: p, locale, t, availability = null }: Pr
   const selectedColor = p.colors?.find((c) => c.id === color);
   const available = availableFor(color);
   const soldOut = available !== null && available <= 0;
-  const stockLabel = soldOut
-    ? L.outOfStock
-    : available !== null && available <= LOW_STOCK_AT
-      ? L.lowStock.replace("{n}", String(available))
-      : L.inStock;
+  const stockLabel = soldOut ? L.outOfStock : available !== null && available <= LOW_STOCK_AT ? L.lowStock.replace("{n}", String(available)) : L.inStock;
   const ageText = p.ageLabel ?? (p.ages[0] ? t.shop.ages[p.ages[0]].name : undefined);
   const images = p.images ?? [];
   const [activeImage, setActiveImage] = useState<number | undefined>(images[0]?.id);
-  const shown = images.find((i) => i.id === activeImage) ?? images[0];
+  const onActiveChange = useCallback((id: number) => setActiveImage(id), []);
 
   useEffect(() => {
     document.body.classList.add("has-buybar");
@@ -62,60 +61,55 @@ export function ProductBuyBox({ product: p, locale, t, availability = null }: Pr
     router.push(localePath(locale, "/checkout"));
   };
 
+  const askHala = () => openHala(L.askHalaPrompt.replace("{name}", p.name));
+
+  const asideRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = asideRef.current;
+    if (!el) return;
+    const place = () => {
+      const top = Math.min(STICKY_TOP, window.innerHeight - el.offsetHeight - 16);
+      el.style.top = `${top}px`;
+    };
+    place();
+    const ro = new ResizeObserver(place);
+    ro.observe(el);
+    window.addEventListener("resize", place);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", place);
+    };
+  }, []);
+
+  const overlay = (
+    <div className="pointer-events-none absolute left-4 top-4 flex flex-col items-start gap-2">
+      {pct > 0 && <span className="rounded-lg border-2 border-ink bg-accent px-2.5 py-1 font-mono text-xs font-bold text-white">−{pct}%</span>}
+      {p.badge && <span className="rounded-lg border-2 border-ink bg-bg-elev px-2.5 py-1 text-xs font-bold">{p.badge}</span>}
+    </div>
+  );
+
   return (
     <>
-      <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr]">
-        <div className="relative">
-          <div className="kcard overflow-hidden">
-            <div className="relative aspect-[4/3]">
-              {shown ? (
-                <Image
-                  key={shown.id}
-                  src={shown.url}
-                  alt={shown.alt || p.name}
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 55vw, 100vw"
-                  className="object-cover"
-                />
-              ) : (
-                <ProductArt variant={p.art} tint={p.tint} shell={selectedColor?.hex} title={p.name} />
-              )}
-            </div>
-          </div>
-          {images.length > 1 && (
-            <ul className="mt-3 flex gap-2 overflow-x-auto pb-1" aria-label={L.gallery}>
-              {images.map((img) => (
-                <li key={img.id} className="shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => setActiveImage(img.id)}
-                    aria-label={img.alt || p.name}
-                    aria-pressed={img.id === shown?.id}
-                    className={`relative block h-16 w-20 overflow-hidden rounded-xl border-2 transition ${
-                      img.id === shown?.id ? "border-accent shadow-hard-accent" : "border-ink opacity-80 hover:opacity-100"
-                    }`}
-                  >
-                    <Image src={img.url} alt="" fill sizes="80px" className="object-cover" />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          <div className="absolute left-4 top-4 flex flex-col items-start gap-2">
-            {pct > 0 && <span className="rounded-lg border-2 border-ink bg-accent px-2.5 py-1 font-mono text-xs font-bold text-white">−{pct}%</span>}
-            {p.badge && <span className="rounded-lg border-2 border-ink bg-bg-elev px-2.5 py-1 text-xs font-bold">{p.badge}</span>}
-          </div>
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {t.shop.guarantees.map((g) => (
-              <div key={g.title} className="rounded-xl border-2 border-ink bg-bg-elev p-3 text-center">
-                <p className="text-xs font-bold leading-tight">{g.title}</p>
-              </div>
-            ))}
-          </div>
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-x-12 lg:gap-y-12">
+        <div className="min-w-0 lg:col-start-1 lg:row-start-1">
+          <ProductGallery
+            product={p}
+            shellHex={selectedColor?.hex}
+            activeId={activeImage}
+            onActiveChange={onActiveChange}
+            labels={{
+              gallery: L.gallery,
+              zoom: L.zoom,
+              video: L.video,
+              close: t.shop.chat.close,
+              prev: L.prevImage,
+              next: L.nextImage,
+            }}
+            overlay={overlay}
+          />
         </div>
 
-        <div>
+        <aside ref={asideRef} className="lg:sticky lg:top-24 lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:self-start">
           <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted">
             <span>{t.shop.categories[p.category].name}</span>
             {ageText && (
@@ -125,10 +119,10 @@ export function ProductBuyBox({ product: p, locale, t, availability = null }: Pr
               </>
             )}
           </div>
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-balance sm:text-5xl">{p.name}</h1>
-          <p className="mt-3 text-lg text-muted">{p.tagline}</p>
+          <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-balance sm:text-3xl">{p.name}</h1>
+          <p className="mt-2 text-muted">{p.tagline}</p>
 
-          <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
             <Stars rating={p.rating} className="[&>svg]:h-4 [&>svg]:w-4" />
             <span className="font-bold">{p.rating.toFixed(1)}</span>
             <span className="text-muted">
@@ -143,9 +137,9 @@ export function ProductBuyBox({ product: p, locale, t, availability = null }: Pr
             </span>
           </div>
 
-          <div className="mt-6 rounded-2xl border-2 border-ink bg-bg-elev p-5">
+          <div className="mt-5 rounded-2xl border-2 border-ink bg-bg-elev p-5">
             <div className="flex flex-wrap items-baseline gap-3">
-              <Price amount={p.price} locale={locale} className="text-4xl" />
+              <Price amount={p.price} locale={locale} className="text-3xl" />
               {p.compareAtPrice && (
                 <>
                   <ComparePrice amount={p.compareAtPrice} locale={locale} className="text-base" />
@@ -189,16 +183,20 @@ export function ProductBuyBox({ product: p, locale, t, availability = null }: Pr
 
             <div className="mt-5 flex flex-wrap items-center gap-3">
               <span className="text-sm font-bold">{t.shop.cart.quantity}</span>
-              <QtyStepper
-                qty={qty}
-                onChange={(q) => setQty(Math.min(Math.max(1, q), available ?? Number.MAX_SAFE_INTEGER))}
-                label={t.shop.cart.quantity}
-              />
+              <QtyStepper qty={qty} onChange={(q) => setQty(Math.min(Math.max(1, q), available ?? Number.MAX_SAFE_INTEGER))} label={t.shop.cart.quantity} />
             </div>
 
             {soldOut && <p className="mt-4 rounded-lg bg-tint-pink px-3 py-2 text-sm font-semibold">{L.outOfStockHint}</p>}
 
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <div className="mt-5 grid gap-3">
+              <button
+                type="button"
+                onClick={buyNow}
+                disabled={soldOut}
+                className="kbtn kbtn-accent h-12 text-base disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {t.shop.buyNow} →
+              </button>
               <AddToCartButton
                 slug={p.slug}
                 color={color}
@@ -209,25 +207,43 @@ export function ProductBuyBox({ product: p, locale, t, availability = null }: Pr
                 className="h-12 text-base"
                 disabled={soldOut}
               />
-              <button type="button" onClick={buyNow} disabled={soldOut} className="kbtn kbtn-accent h-12 text-base disabled:cursor-not-allowed disabled:opacity-50">
-                {t.shop.buyNow} →
-              </button>
             </div>
-            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-              <a href={`tel:${company.phoneE164}`} className="font-semibold text-accent hover:underline">
-                {t.shop.callUs} · {company.phoneDisplay}
+            <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs font-bold">
+              <a href={`tel:${company.phoneE164}`} className="rounded-xl border-2 border-ink bg-bg px-2 py-2 hover:bg-tint-yellow">
+                {t.shop.callUs}
               </a>
-              <a href={company.zaloUrl} target="_blank" rel="noopener noreferrer" className="font-semibold text-accent hover:underline">
+              <a
+                href={company.zaloUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-xl border-2 border-ink bg-bg px-2 py-2 hover:bg-tint-yellow"
+              >
                 {t.shop.zalo}
               </a>
+              <button type="button" onClick={askHala} className="rounded-xl border-2 border-ink bg-bg px-2 py-2 hover:bg-tint-yellow">
+                {L.askHala}
+              </button>
             </div>
+            <p className="mt-2 text-center text-xs text-muted">{company.phoneDisplay}</p>
           </div>
 
-          <dl className="mt-6 text-sm">
+          <ul className="mt-4 grid grid-cols-2 gap-2">
+            {t.shop.guarantees.map((g) => (
+              <li key={g.title} className="flex items-start gap-2 rounded-xl border-2 border-ink bg-bg-elev px-3 py-2 text-xs">
+                <span className="mt-0.5 text-[#0d6b3a]">✓</span>
+                <span className="font-bold leading-tight">{g.title}</span>
+              </li>
+            ))}
+          </ul>
+        </aside>
+
+        <div className="min-w-0 lg:col-start-1 lg:row-start-2">
+          <dl className="rounded-2xl border-2 border-ink bg-bg-elev p-5 text-sm">
             <dt className="text-xs font-bold uppercase tracking-wider text-muted">{L.audience}</dt>
             <dd className="mt-1 font-semibold">{p.audience}</dd>
+            <dd className="mt-3 text-muted">{p.summary}</dd>
           </dl>
-          <p className="mt-4 text-muted">{p.summary}</p>
+          {children}
         </div>
       </div>
 
@@ -253,7 +269,11 @@ export function ProductBuyBox({ product: p, locale, t, availability = null }: Pr
                 {L.outOfStock}
               </span>
             ) : (
-              <Link href={localePath(locale, "/checkout")} onClick={() => add({ slug: p.slug, color, qty }, false)} className="kbtn kbtn-accent h-10 px-3 text-sm">
+              <Link
+                href={localePath(locale, "/checkout")}
+                onClick={() => add({ slug: p.slug, color, qty }, false)}
+                className="kbtn kbtn-accent h-10 px-3 text-sm"
+              >
                 {t.shop.buyNow}
               </Link>
             )}
